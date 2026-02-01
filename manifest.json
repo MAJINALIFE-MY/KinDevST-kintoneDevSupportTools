@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "KinDevST - kintone Developer Support Tool",
+  "version": "1.0.0",
+  "description": "kintoneのセッション認証を利用してREST API・JS APIを実行する開発者向けChrome拡張機能",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "storage",
+    "idle"
+  ],
+  "host_permissions": [
+    "https://*.cybozu.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {},
+  "content_scripts": [
+    {
+      "matches": ["https://*.cybozu.com/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

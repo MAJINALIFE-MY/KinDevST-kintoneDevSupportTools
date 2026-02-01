@@ -1,0 +1,1508 @@
+[
+  {
+    "category": "kintone REST APIの実行",
+    "apis": [
+      {
+        "name": "kintone.api(pathOrUrl, method, params, successCallback, failureCallback)",
+        "displayName": "kintone REST APIリクエストを送信する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/api/kintone-rest-api-request/",
+        "args": [
+          {
+            "name": "pathOrUrl",
+            "type": "string",
+            "required": true,
+            "description": "kintone APIのパスまたはURL（例: '/k/v1/records.json'）",
+            "placeholder": "/k/v1/records.json"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "HTTPメソッド（GET, POST, PUT, DELETE）",
+            "placeholder": "GET"
+          },
+          {
+            "name": "params",
+            "type": "object",
+            "required": true,
+            "description": "実行するAPIのリクエストパラメーター",
+            "placeholder": "{\"app\": 1, \"id\": 1}"
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "APIの呼び出しが成功したときに実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          },
+          {
+            "name": "failureCallback",
+            "type": "function",
+            "required": false,
+            "description": "APIの呼び出しが失敗したときに実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.api.url()",
+        "displayName": "APIのURLを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/api/get-url/",
+        "args": [
+          {
+            "name": "path",
+            "type": "string",
+            "required": true,
+            "description": "kintone APIのパス（例: '/k/v1/records.json'）",
+            "placeholder": "/k/v1/records.json"
+          },
+          {
+            "name": "isGuestSpace",
+            "type": "boolean",
+            "required": false,
+            "description": "ゲストスペースのAPIかどうか（省略可、デフォルト: false）",
+            "placeholder": "false"
+          }
+        ]
+      },
+      {
+        "name": "kintone.api.urlForGet(path, params, isGuestSpace)",
+        "displayName": "クエリ文字列付きのAPIのURLを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/api/get-url-including-query/",
+        "args": [
+          {
+            "name": "path",
+            "type": "string",
+            "required": true,
+            "description": "kintone APIのパス（例: '/k/v1/records.json'）",
+            "placeholder": "/k/v1/records.json"
+          },
+          {
+            "name": "params",
+            "type": "object",
+            "required": false,
+            "description": "クエリ文字列として付与するパラメーター",
+            "placeholder": "{\"app\": 1, \"id\": 1}"
+          },
+          {
+            "name": "params",
+            "type": "boolean",
+            "required": false,
+            "description": "ゲストスペース用のURLを取得するかどうか",
+            "placeholder": "true"
+          }
+        ]
+      },
+      {
+        "name": "kintone.getRequestToken()",
+        "displayName": "CSRFトークンを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/api/get-csrf-token/",
+        "args": []
+      },
+      {
+        "name": "kintone.api.getConcurrencyLimit()",
+        "displayName": "kintone REST API同時接続数を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/api/get-concurrency-limit/",
+        "args": [],
+        "returnsPromise": true
+      }
+    ]
+  },
+  {
+    "category": "外部APIの実行",
+    "apis": [
+      {
+        "name": "kintone.proxy(url, method, headers, data, successCallback, failureCallback)",
+        "displayName": "外部のAPIを実行する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/proxy/kintone-proxy/",
+        "args": [
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "実行するAPIのURL",
+            "placeholder": "https://example.com/api"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "APIの実行に使用するHTTPメソッド（GET, POST, PUT, DELETE）",
+            "placeholder": "GET"
+          },
+          {
+            "name": "headers",
+            "type": "object",
+            "required": true,
+            "description": "リクエストヘッダー（何も指定しない場合は{}を指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "data",
+            "type": "object",
+            "required": true,
+            "description": "リクエストボディ（オブジェクトまたは文字列、何も指定しない場合は{}を指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが完了したときに実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          },
+          {
+            "name": "failureCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが失敗した時に実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.proxy.upload(url, method, headers, data, successCallback, failureCallback)",
+        "displayName": "【動作確認中】外部にファイルをアップロードする",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/proxy/kintone-proxy-upload/",
+        "args": [
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "外部APIのURL",
+            "placeholder": "https://example.com/api/upload"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "HTTPメソッド（POST, PUT）",
+            "placeholder": "POST"
+          },
+          {
+            "name": "headers",
+            "type": "object",
+            "required": true,
+            "description": "リクエストヘッダー",
+            "placeholder": "{\"Content-Type\": \"application/json\"}"
+          },
+          {
+            "name": "data",
+            "type": "object",
+            "required": true,
+            "description": "リクエストボディ",
+            "placeholder": "{\"file\": fileObject}"
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが完了したときに実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          },
+          {
+            "name": "failureCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが失敗した時に実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          }
+        ],
+        "returnsPromise": true
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - レコード",
+    "apis": [
+      {
+        "name": "kintone.app.record.getId()",
+        "displayName": "レコードIDを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-id/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.get()",
+        "displayName": "レコードの値を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.set(record)",
+        "displayName": "レコードに値をセットする",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/set-record-value/",
+        "args": [
+          {
+            "name": "record",
+            "type": "object",
+            "required": true,
+            "description": "セットするレコードのデータ（kintone.app.record.get()の戻り値と同じ形式。各フィールドにtypeプロパティが必要）",
+            "placeholder": "{\"record\": {\"フィールドコード\": {\"type\": \"SINGLE_LINE_TEXT\", \"value\": \"値\"}}}"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.record.getPermissions()",
+        "displayName": "ログインユーザーのレコードに対するアクセス権を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-permissions/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getFieldPermissions()",
+        "displayName": "ログインユーザーのレコードのフィールドに対するアクセス権を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-field-permissions/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getStatusHistory(offset, limit)",
+        "displayName": "レコードのステータスの履歴を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-status-history/",
+        "args": [
+          {
+            "name": "offset",
+            "type": "number",
+            "required": false,
+            "description": "取得するステータスの履歴の先頭からスキップする数（省略すると0が設定されます）",
+            "placeholder": "0"
+          },
+          {
+            "name": "limit",
+            "type": "number",
+            "required": false,
+            "description": "取得するステータスの履歴の数（1から100まで指定できます。省略すると100が設定されます）",
+            "placeholder": "100"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.getActions()",
+        "displayName": "実行可能なアプリのアクションの一覧を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-actions/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - アプリ",
+    "apis": [
+      {
+        "name": "kintone.app.get()",
+        "displayName": "アプリ情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-app/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getId()",
+        "displayName": "アプリのIDを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-app-id/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getFormFields()",
+        "displayName": "アプリのフィールド情報を一括取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-form-fields/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getFormLayout()",
+        "displayName": "アプリのフォームのレイアウトを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-form-layout/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.isTestEnvironment()",
+        "displayName": "アプリの動作テスト環境かどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/is-test-environment/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.isMaintenanceMode()",
+        "displayName": "アプリがメンテナンスモードかどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/is-maintenance-mode/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.showDescription(state)",
+        "displayName": "アプリの説明の開閉を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/show-or-hide-app-description/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "OPEN：アプリの説明を開く、CLOSED：アプリの説明を閉じる",
+            "placeholder": "OPEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getIcons(apps)",
+        "displayName": "アプリのアイコンのURLを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-app-icon-urls/",
+        "args": [
+          {
+            "name": "apps",
+            "type": "array",
+            "required": true,
+            "description": "アプリIDのリスト（最大で100件のアプリIDを指定できます）",
+            "placeholder": "[1, 2]"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getFieldElements(fieldCode)",
+        "displayName": "レコード一覧のフィールド要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-field-elements/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "取得するフィールドのフィールドコード",
+            "placeholder": "文字列_0"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.getHeaderMenuSpaceElement()",
+        "displayName": "レコード一覧のメニューの右側の要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-header-menu-element/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getHeaderSpaceElement()",
+        "displayName": "レコード一覧のメニューの下側の要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-header-element/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getView()",
+        "displayName": "レコード一覧の設定を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-view/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getViews()",
+        "displayName": "レコード一覧の一覧を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-views/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getQueryCondition()",
+        "displayName": "レコード一覧のクエリ文字列を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-query/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getQuery()",
+        "displayName": "レコード一覧のクエリ文字列を取得する（オプション付き）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-record-list-query-with-order-by-limit-offset/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getReports()",
+        "displayName": "グラフの一覧を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-reports/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getLookupTargetAppId(fieldCode)",
+        "displayName": "ルックアップフィールドの参照先のアプリIDを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-lookup-target/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "ルックアップフィールドのフィールドコード",
+            "placeholder": "ルックアップ"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.getRelatedRecordsTargetAppId(fieldCode)",
+        "displayName": "関連レコード一覧の参照先のアプリIDを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-related-records-target/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "関連レコード一覧フィールドのフィールドコード",
+            "placeholder": "関連レコード一覧"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.getStatus()",
+        "displayName": "プロセス管理の設定を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-status/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getStatusActions()",
+        "displayName": "実行可能なプロセス管理のアクションの一覧を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-status-actions/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getAssignees()",
+        "displayName": "プロセス管理の現在の作業者を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-status-assignees/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getCategories()",
+        "displayName": "カテゴリーの設定情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-categories/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getPermissions()",
+        "displayName": "ログインユーザーのアプリに対するアクセス権を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-app-permissions/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - スペース",
+    "apis": [
+      {
+        "name": "kintone.space.get()",
+        "displayName": "スペース情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/space/get-space/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.space.getPermissions()",
+        "displayName": "ログインユーザーのスペースに対するアクセス権を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/space/get-space-permissions/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - システム",
+    "apis": [
+      {
+        "name": "kintone.system.getAvailableFeatures()",
+        "displayName": "機能の有効化状況を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/system/get-available-features/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.system.getPermissions()",
+        "displayName": "ログインユーザーのシステムに対する権限を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/system/get-system-permissions/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - ライセンス",
+    "apis": [
+      {
+        "name": "kintone.license.isTrial()",
+        "displayName": "試用中かどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/license/is-trial/",
+        "args": []
+      },
+      {
+        "name": "kintone.license.getSubscriptionPlan()",
+        "displayName": "kintoneの契約中のコースを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/license/get-course/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "情報の取得／設定 - 全体",
+    "apis": [
+      {
+        "name": "kintone.getLoginUser()",
+        "displayName": "ログインユーザーの情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-login-user/",
+        "args": []
+      },
+      {
+        "name": "kintone.user.getCustomFields(code)",
+        "displayName": "ユーザーのカスタマイズ項目を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-custom-fields/",
+        "args": [
+          {
+            "name": "code",
+            "type": "string",
+            "required": false,
+            "description": "情報を取得するユーザーのログイン名（省略した場合はログインユーザーの情報を取得します）",
+            "placeholder": "user1"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.user.getGroups()",
+        "displayName": "ログインユーザーが所属するグループ（ロール）を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-groups/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.user.getOrganizations()",
+        "displayName": "ログインユーザーが所属する組織を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-organizations/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.getPageType()",
+        "displayName": "表示中の画面を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-page-type/",
+        "args": []
+      },
+      {
+        "name": "kintone.user.getIcons(users)",
+        "displayName": "ユーザーのアイコンを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-user-icons/",
+        "args": [
+          {
+            "name": "users",
+            "type": "array",
+            "required": true,
+            "description": "ユーザーのログイン名のリスト（最大で100件まで指定できます）",
+            "placeholder": "[\"user1\", \"user2\"]"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.getUiVersion()",
+        "displayName": "デザインのバージョンを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-design/",
+        "args": []
+      },
+      {
+        "name": "kintone.getAvailableServices()",
+        "displayName": "cybozu.comの他のサービスを利用可能かを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-available-services/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.getDomain()",
+        "displayName": "ドメイン情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-domains/",
+        "args": []
+      },
+      {
+        "name": "kintone.getAvailableApiTypes()",
+        "displayName": "利用可能なAPIの種類を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-available-api-types/",
+        "args": []
+      },
+      {
+        "name": "kintone.isAccessWithClientCertificateAuthentication()",
+        "displayName": "セキュアアクセスかどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/is-access-with-client-certificate-authentication/",
+        "args": []
+      },
+      {
+        "name": "kintone.isMobileApp()",
+        "displayName": "モバイルアプリからのアクセスかどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/is-mobile-app/",
+        "args": []
+      },
+      {
+        "name": "kintone.isMobilePage()",
+        "displayName": "モバイル版の画面かどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/is-mobile-page/",
+        "args": []
+      },
+      {
+        "name": "kintone.getUserPreference()",
+        "displayName": "ログインユーザーの個人設定を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-user-preference/",
+        "args": [],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.isUsersAndSystemAdministrator()",
+        "displayName": "ログインユーザーがcybozu.com共通管理者かどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/is-user-and-system-administrator/",
+        "args": []
+      },
+      {
+        "name": "kintone.isRevampedUI()",
+        "displayName": "フロントエンド基盤の刷新後の画面かどうかを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/is-revamped-ui/",
+        "args": []
+      },
+      {
+        "name": "kintone.showConfirmDialog(config)",
+        "displayName": "確認ダイアログを表示する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/show-confirm-dialog/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "ダイアログの設定（title, body, showOkButton, okButtonText, showCancelButton, cancelButtonText, showCloseButton等）",
+            "placeholder": "{\"title\": \"確認\", \"body\": \"このレコードを削除しますか？\", \"showOkButton\": true, \"okButtonText\": \"削除\", \"showCancelButton\": true, \"cancelButtonText\": \"キャンセル\", \"showCloseButton\": true}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.createDialog(config)",
+        "displayName": "【制限あり】ダイアログを作成する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/create-dialog/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "【注意】: bodyはElementオブジェクト、beforeCloseは関数のため、この拡張機能では使用できません。ダイアログの設定（title, body: Elementオブジェクト, showOkButton, okButtonText, showCancelButton, cancelButtonText, showCloseButton, beforeClose: 関数等）。",
+            "placeholder": "{\"title\": \"確認\", \"showOkButton\": true, \"okButtonText\": \"削除する\", \"showCancelButton\": true, \"cancelButtonText\": \"キャンセル\", \"showCloseButton\": true}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.showNotification(type, message)",
+        "displayName": "画面上部にメッセージを表示する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/show-notification/",
+        "args": [
+          {
+            "name": "type",
+            "type": "string",
+            "required": true,
+            "description": "NotificationUIのタイプ（ERROR：エラーを表す赤色、SUCCESS：成功を表す緑色、INFO：情報を表す青色）",
+            "placeholder": "SUCCESS"
+          },
+          {
+            "name": "message",
+            "type": "string",
+            "required": true,
+            "description": "NotificationUIに表示するメッセージのテキスト",
+            "placeholder": "処理が完了しました"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.showLoading(state)",
+        "displayName": "ローディングを表示する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/show-loading/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "表示状態（VISIBLE：表示、HIDDEN：非表示）",
+            "placeholder": "VISIBLE"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.buildPageUrl(page, params)",
+        "displayName": "kintone内の画面のURLを組み立てる",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/build-page-url/",
+        "args": [
+          {
+            "name": "page",
+            "type": "string",
+            "required": true,
+            "description": "画面を表す文字列（例: APP_INDEX, APP_CREATE, APP_DETAIL, APP_EDIT, APP_PRINT, APP_REPORT, PORTAL_TOP等）",
+            "placeholder": "APP_INDEX"
+          },
+          {
+            "name": "params",
+            "type": "object",
+            "required": true,
+            "description": "URLの組み立てに使用する引数（appId, recordId, viewId, reportId, spaceId, threadId, userCode等。画面によって必須項目が異なります）",
+            "placeholder": "{\"appId\": 123}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.setKeyboardShortcuts(config)",
+        "displayName": "ショートカットキーの有効／無効を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/set-keyboard-shortcuts/",
+        "args": [
+          {
+            "name": "config",
+            "type": "boolean|object",
+            "required": true,
+            "description": "ショートカットキーの設定。true：すべて有効、false：すべて無効、オブジェクト：個別のショートカットキーを有効／無効にする（例: {\"SHOW_RECORD\": true, \"CREATE_RECORD\": false}）",
+            "placeholder": "true"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.getKeyboardShortcuts()",
+        "displayName": "ショートカットキーの有効／無効の状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/kintone/get-keyboard-shortcuts/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "フィールド表示／非表示",
+    "apis": [
+      {
+        "name": "kintone.app.record.setFieldShown(fieldCode, isShown)",
+        "displayName": "フィールドの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-a-field/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "フィールドコード",
+            "placeholder": "field_code"
+          },
+          {
+            "name": "isShown",
+            "type": "boolean",
+            "required": true,
+            "description": "フィールドを表示するかどうか（true：フィールドを表示する、false：フィールドを非表示にする）",
+            "placeholder": "true"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.record.setGroupFieldOpen(fieldCode, isOpen)",
+        "displayName": "グループフィールドを開閉する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/open-field-group/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "グループフィールドのフィールドコード",
+            "placeholder": "グループ"
+          },
+          {
+            "name": "isOpen",
+            "type": "boolean",
+            "required": true,
+            "description": "開く場合はtrue、閉じる場合はfalse",
+            "placeholder": "true"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.record.isFieldVisible(fieldCode)",
+        "displayName": "【動作確認中】フィールドの表示／非表示の状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/is-field-visible/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "フィールドコード",
+            "placeholder": "field_code"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.record.isGroupFieldOpen(fieldCode)",
+        "displayName": "グループフィールドの開閉状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/is-group-field-open/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "グループフィールドのフィールドコード",
+            "placeholder": "group_field"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "要素の表示／非表示",
+    "apis": [
+      {
+        "name": "kintone.app.showAddRecordButton(state)",
+        "duplicate": "kintone.app.showDescription"
+      },
+      {
+        "name": "kintone.app.showAddRecordButton(state)",
+        "displayName": "レコードの追加ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-add-record-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showAppSettingsButton(state)",
+        "displayName": "アプリの設定ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-app-settings-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showDuplicateRecordButton(state)",
+        "displayName": "レコードの再利用ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-duplicate-record-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showEditRecordButton(state)",
+        "displayName": "レコードの編集ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-edit-record-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showFilterButton(state)",
+        "displayName": "絞り込みボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-filter-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showViewAndReportSelector(state)",
+        "displayName": "一覧とグラフを選択するパーツの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-view-and-report-selector/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：一覧とグラフの切り替えパーツを表示する、HIDDEN：一覧とグラフの切り替えパーツを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showReportSelectorItems(config)",
+        "displayName": "グラフを選択するパーツの選択肢の表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-report-selctor-items/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "選択肢の表示／非表示の設定（グラフのIDをキーとして、VISIBLEまたはHIDDENを値として指定）",
+            "placeholder": "{\"数字7ケタのグラフID\": \"HIDDEN\"}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showViewSelectorItems(config)",
+        "displayName": "一覧を選択するパーツの選択肢の表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-view-selector-items/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "選択肢の表示／非表示の設定（一覧のIDをキーとして、VISIBLEまたはHIDDENを値として指定）",
+            "placeholder": "{\"数字7ケタの一覧ID\": \"HIDDEN\"}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showOptionsButton(state)",
+        "displayName": "アプリのオプションボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-option-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showPager(state)",
+        "displayName": "前／次のレコードに移動するボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-record-nav-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.showReportButton(state)",
+        "displayName": "集計ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-report-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showSideBar(state)",
+        "displayName": "サイドバーの開閉を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-side-bar/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "OPEN：サイドバーを開く、CLOSED：サイドバーを閉じる、COMMENTS：レコードコメントを表示する、HISTORY：レコードの変更履歴を表示する",
+            "placeholder": "OPEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showActionButton(action, state)",
+        "displayName": "アプリのアクションボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-action-button/",
+        "args": [
+          {
+            "name": "action",
+            "type": "string",
+            "required": true,
+            "description": "表示／非表示を変更するアクションの名前（複数の言語で設定している場合、ユーザーの表示言語での名前を指定）",
+            "placeholder": "アクション名"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "VISIBLE"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showStatusActionButton(action, state)",
+        "displayName": "プロセス管理のアクションボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-status-action-button/",
+        "args": [
+          {
+            "name": "action",
+            "type": "string",
+            "required": true,
+            "description": "表示／非表示を変更するアクションの名前（複数の言語で設定している場合、ユーザーの表示言語での名前を指定）",
+            "placeholder": "アクション名"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.showChangeAssigneeButton(state)",
+        "displayName": "【動作確認中】「現在の作業者を変更」ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-change-assignee-button/",
+        "args": [
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true
+      }
+    ]
+  },
+  {
+    "category": "要素の表示状態取得",
+    "apis": [
+      {
+        "name": "kintone.app.getDescriptionDisplayState()",
+        "displayName": "アプリの説明の表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/app/get-display-state-app-description/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getSideBarDisplayState()",
+        "displayName": "サイドバーの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-side-bar/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getAddRecordButtonDisplayState()",
+        "displayName": "レコード追加ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-add-record-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getEditRecordButtonDisplayState()",
+        "displayName": "レコード編集ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-edit-record-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getDuplicateRecordButtonDisplayState()",
+        "displayName": "レコード再利用ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-duplicate-record-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getAppSettingsButtonDisplayState()",
+        "displayName": "アプリ設定ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-app-settings-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getOptionsButtonDisplayState()",
+        "displayName": "アプリのオプションボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-option-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getPagerDisplayState()",
+        "displayName": "前／次のレコードに移動するボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-record-nav-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getFilterButtonDisplayState()",
+        "displayName": "絞り込みボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-filter-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getReportButtonDisplayState()",
+        "displayName": "集計ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-report-button/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getViewAndReportSelectorDisplayState()",
+        "displayName": "一覧とグラフを選択するパーツの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-view-and-report-selector/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getReportSelectorItemsDisplayState()",
+        "displayName": "グラフを選択するパーツの選択肢の表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-report-selector-items/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.getViewSelectorItemsDisplayState()",
+        "displayName": "一覧を選択するパーツの選択肢の表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-view-selector-items/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getActionButtonDisplayState(action)",
+        "displayName": "アプリのアクションボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-action-button/",
+        "args": [
+          {
+            "name": "action",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するアクションの名前（複数の言語で設定している場合、ユーザーの表示言語での名前を指定）",
+            "placeholder": "アクション名"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.getStatusActionButtonDisplayState(action)",
+        "displayName": "プロセス管理のアクションボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-status-action-button/",
+        "args": [
+          {
+            "name": "action",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するアクションの名前（複数の言語で設定している場合、ユーザーの表示言語での名前を指定）。注意: kintone.app.record.getStatusActions()で取得したnameプロパティの値を使用してください。",
+            "placeholder": "作業中に戻す"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.getChangeAssigneeButtonDisplayState()",
+        "displayName": "「現在の作業者を変更」ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-change-assignee-button/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "要素の取得 - レコード詳細画面",
+    "apis": [
+      {
+        "name": "kintone.app.record.getFieldElement(id)",
+        "displayName": "フィールド要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-field-element/",
+        "args": [
+          {
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "フィールドコード",
+            "placeholder": "field_code"
+          }
+        ]
+      },
+      {
+        "name": "kintone.app.record.getHeaderMenuSpaceElement()",
+        "displayName": "メニューの上側の要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-record-header-menu-element/",
+        "args": []
+      },
+      {
+        "name": "kintone.app.record.getSpaceElement(id)",
+        "displayName": "スペースフィールドの要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-space-element/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スペースフィールドのフィールドコード",
+            "placeholder": "space_field"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "category": "要素の取得 - レコード一覧画面",
+    "apis": [
+      {
+        "name": "kintone.app.getFieldElements(fieldCode)",
+        "duplicate": "kintone.app.getFieldElements(fieldCode)"
+      },
+      {
+        "name": "kintone.app.getHeaderMenuSpaceElement()",
+        "duplicate": "kintone.app.getHeaderMenuSpaceElement()"
+      },
+      {
+        "name": "kintone.app.getHeaderSpaceElement()",
+        "duplicate": "kintone.app.getHeaderSpaceElement()"
+      }
+    ]
+  },
+  {
+    "category": "要素の取得 - ポータル画面",
+    "apis": [
+      {
+        "name": "kintone.portal.getContentSpaceElement()",
+        "displayName": "ポータルの上側の要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/portal/get-content-portal-element/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "要素の取得 - スペース画面",
+    "apis": [
+      {
+        "name": "kintone.space.portal.getContentSpaceElement()",
+        "displayName": "スペースのポータル画面の上側の要素を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/space/get-content-space-element/",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "プラグイン",
+    "apis": [
+      {
+        "name": "kintone.plugin.app.getConfig(pluginId)",
+        "displayName": "プラグインの設定情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/get-config/",
+        "args": [
+          {
+            "name": "pluginId",
+            "type": "string",
+            "required": true,
+            "description": "設定情報を取得するプラグインのプラグインID",
+            "placeholder": "your-plugin-id"
+          }
+        ]
+      },
+      {
+        "name": "kintone.plugin.app.setConfig(config, successCallback)",
+        "displayName": "プラグインの設定情報を保存する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/set-config/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "プラグインに保存する設定（キーはASCII互換文字、値は文字列で指定）",
+            "placeholder": "{\"key1\": \"value1\", \"key2\": \"value2\"}"
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "設定の保存が完了したあとに実行する関数（省略可。省略するとプラグインの一覧画面に遷移）",
+            "placeholder": ""
+          }
+        ]
+      },
+      {
+        "name": "kintone.plugin.app.getProxyConfig(url, method)",
+        "displayName": "【動作確認中】外部APIの実行に必要な情報を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/get-config-for-proxy/",
+        "args": [
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "実行するAPIのURL",
+            "placeholder": "https://api.example.com"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "HTTPメソッド（GET, POST, PUT, DELETE）",
+            "placeholder": "POST"
+          }
+        ]
+      },
+      {
+        "name": "kintone.plugin.app.setProxyConfig(url, method, headers, data, successCallback)",
+        "displayName": "【動作確認中】外部APIの実行に必要な情報を保存する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/set-config-for-proxy/",
+        "args": [
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "実行するAPIのURL",
+            "placeholder": "https://api.example.com"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "HTTPメソッド（GET, POST, PUT, DELETE）",
+            "placeholder": "POST"
+          },
+          {
+            "name": "headers",
+            "type": "object",
+            "required": true,
+            "description": "APIのリクエストヘッダーに加えるパラメーター（何も指定しない場合は{}を指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "data",
+            "type": "object",
+            "required": true,
+            "description": "APIのリクエストデータに加えるリクエストボディ（何も指定しない場合は{}を指定。プロパティの値にオブジェクト形式の値を指定できません）",
+            "placeholder": "{\"key1\": \"value1\", \"key2\": \"value2\"}",
+            "defaultValue": {}
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "外部APIのリクエスト情報の保存が完了したときに実行されるコールバック関数（省略可）",
+            "placeholder": ""
+          }
+        ]
+      },
+      {
+        "name": "kintone.plugin.app.proxy(pluginId, url, method, headers, data, successCallback, failureCallback)",
+        "displayName": "【動作確認中】プラグインから外部APIを実行する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/kintone-plug-in-proxy/",
+        "args": [
+          {
+            "name": "pluginId",
+            "type": "string",
+            "required": true,
+            "description": "APIを実行するプラグインのプラグインID",
+            "placeholder": "your-plugin-id"
+          },
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "実行するAPIのURL",
+            "placeholder": "https://api.example.com"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "APIの実行に使用するHTTPメソッド（GET, POST, PUT, DELETE）",
+            "placeholder": "GET"
+          },
+          {
+            "name": "headers",
+            "type": "object",
+            "required": true,
+            "description": "リクエストヘッダー（何も指定しない場合は{}を指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "data",
+            "type": "object|string",
+            "required": true,
+            "description": "リクエストボディ（オブジェクトまたは文字列。何も指定しない場合は{}を指定。GET/DELETEの場合はURLのクエリ文字列として指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが完了したあとに実行する関数（省略可。省略するとPromiseオブジェクトが返ります）",
+            "placeholder": ""
+          },
+          {
+            "name": "failureCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが失敗した場合に実行する関数（省略可。省略するとPromiseオブジェクトが返ります）",
+            "placeholder": ""
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.plugin.app.proxy.upload(pluginId, url, method, headers, data, successCallback, failureCallback)",
+        "displayName": "【動作確認中】プラグインから外部にファイルをアップロードする",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/plugins/kintone-plug-in-proxy-upload/",
+        "args": [
+          {
+            "name": "pluginId",
+            "type": "string",
+            "required": true,
+            "description": "APIを実行するプラグインのプラグインID",
+            "placeholder": "your-plugin-id"
+          },
+          {
+            "name": "url",
+            "type": "string",
+            "required": true,
+            "description": "リクエストURL",
+            "placeholder": "https://api.example.com/upload"
+          },
+          {
+            "name": "method",
+            "type": "string",
+            "required": true,
+            "description": "HTTPメソッド（POST, PUT）",
+            "placeholder": "POST"
+          },
+          {
+            "name": "headers",
+            "type": "object",
+            "required": true,
+            "description": "リクエストヘッダー（何も指定しない場合は{}を指定）",
+            "placeholder": "{}",
+            "defaultValue": {}
+          },
+          {
+            "name": "data",
+            "type": "object",
+            "required": true,
+            "description": "リクエストボディ（format: \"RAW\"（必須）、value: Blob型またはFile型（必須、200MBまで））",
+            "placeholder": "{\"format\": \"RAW\", \"value\": fileObject}"
+          },
+          {
+            "name": "successCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが完了したあとに実行する関数（省略可。省略するとPromiseオブジェクトが返ります）",
+            "placeholder": ""
+          },
+          {
+            "name": "failureCallback",
+            "type": "function",
+            "required": false,
+            "description": "リクエストが失敗した場合に実行する関数（省略可。省略するとPromiseオブジェクトが返ります）",
+            "placeholder": ""
+          }
+        ],
+        "returnsPromise": true
+      }
+    ]
+  }
+]

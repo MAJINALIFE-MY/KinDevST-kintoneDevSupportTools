@@ -1,0 +1,610 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+  color: #333;
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+}
+
+/* タブのスタイル */
+.tabs {
+  display: flex;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: bold;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background-color: #f9f9f9;
+}
+
+.tab-button.active {
+  color: #2c5cff; /* kintoneっぽい青 */
+  border-bottom: 2px solid #2c5cff;
+}
+
+/* コンテンツエリアのスタイル */
+.tab-content {
+  display: none;
+  padding: 15px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* フォーム要素の共通スタイル */
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+input[type="text"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* paddingを含めた幅にする */
+  font-family: monospace;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button.primary-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.primary-btn:hover {
+  background-color: #2980b9;
+}
+
+button.secondary-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.secondary-btn:hover {
+  background-color: #5a6268;
+}
+
+/* 結果表示エリア */
+/* ヘッダー表示エリア */
+.headers-area {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.headers-section {
+  margin-bottom: 15px;
+}
+
+.headers-section:last-child {
+  margin-bottom: 0;
+}
+
+.headers-section label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.headers-section pre {
+  margin: 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Response Body用のスタイル（headers-section内で使用） */
+#rest-result {
+  max-height: 400px;
+}
+
+/* 履歴表示エリア */
+.history-item {
+  margin-bottom: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  position: relative;
+}
+
+.history-item-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.history-item-header {
+  flex: 0 0 30%;
+  font-size: 0.9em;
+  color: #666;
+  font-family: monospace;
+}
+
+.history-buttons {
+  flex: 0 0 70%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.history-item-api {
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+
+.history-rerun-btn {
+  padding: 4px 8px;
+  font-size: 0.8em;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.history-rerun-btn:hover {
+  background-color: #218838;
+}
+
+.history-copy-btn {
+  padding: 4px 8px;
+  font-size: 0.8em;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.history-copy-btn:hover {
+  background-color: #2980b9;
+}
+
+.history-delete-btn {
+  padding: 4px 8px;
+  font-size: 0.8em;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.history-delete-btn:hover {
+  background-color: #c82333;
+}
+
+.history-item-header {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 5px;
+  font-family: monospace;
+}
+
+.history-item-api {
+  font-size: 0.9em;
+  color: #333;
+  margin-bottom: 5px;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.history-item-result {
+  margin-top: 5px;
+}
+
+.history-item-result pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.85em;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 8px;
+  border-radius: 3px;
+}
+
+/* 設定画面のスタイル */
+.auth-method-section {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.auth-method-section.active {
+  display: block;
+}
+
+/* Select2のスタイル調整 */
+.select2-container {
+  width: 100% !important;
+  max-width: 100%; /* 幅を制限 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.select2-container--default .select2-selection--single {
+  height: 38px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 38px;
+  padding-left: 8px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 36px;
+}
+
+.select2-dropdown {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 9999;
+  max-width: 100%; /* 幅を制限 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #3498db;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* API情報表示エリア */
+.api-info-display {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.api-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.api-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.api-info-label {
+  font-weight: bold;
+  color: #666;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.api-method {
+  padding: 2px 8px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 3px;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.api-endpoint {
+  color: #333;
+  word-break: break-all;
+}
+
+/* REST API設定セクション */
+.rest-api-settings-section {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+/* 認証設定セクション（旧スタイル、後方互換性のため残す） */
+.auth-settings-section {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+/* 履歴設定セクション */
+.history-settings-section {
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.section-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.subsection-title {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #555;
+}
+
+.auth-settings-subsection {
+  margin-bottom: 20px;
+}
+
+.display-settings-subsection {
+  margin-bottom: 20px;
+}
+
+/* チェックボックスラベル */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* 読み取り専用入力フィールド */
+input[readonly] {
+  background-color: #eee;
+}
+
+/* 説明テキスト */
+.help-text {
+  color: #666;
+  font-size: 0.8em;
+}
+
+.help-text-block {
+  color: #666;
+  font-size: 0.8em;
+  display: block;
+  margin-top: 5px;
+}
+
+/* セッション認証の説明 */
+.auth-description {
+  font-size: 0.9em;
+}
+
+/* ボタンのマージン調整 */
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* メッセージ表示 */
+.save-message {
+  margin-top: 10px;
+  color: green;
+  display: none;
+}
+
+/* ドキュメントリンク */
+.doc-link {
+  margin-top: 5px;
+  font-size: 0.9em;
+  display: none;
+}
+
+/* コピーボタン */
+.copy-btn {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background-color: #2980b9;
+}
+
+/* 結果ヘッダー */
+.result-header {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 5px;
+  font-family: monospace;
+}
+
+/* 履歴コンテナ */
+.history-container {
+  margin-top: 20px;
+}
+
+.history-title {
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+/* 位置指定 */
+.position-relative {
+  position: relative;
+}
+
+/* 非表示 */
+.hidden {
+  display: none;
+}
+
+/* ===== 以下、リファクタリングで追加したスタイル ===== */
+
+/* サンプル入力ボタン */
+.sample-input-btn {
+  margin-left: 10px;
+  padding: 4px 8px;
+  font-size: 0.85em;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sample-input-btn:hover {
+  background-color: #45a049;
+}
+
+/* ラベルとボタンのコンテナ */
+.label-with-button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+/* 引数ラベル（無効化） */
+.arg-label-disabled {
+  color: #999;
+}
+
+/* 引数説明文 */
+.arg-description {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 2px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+/* 無効化された入力フィールド */
+.input-disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* 引数なしメッセージ */
+.no-args-message {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* API選択メッセージ */
+.api-select-message {
+  color: #999;
+  font-size: 0.9em;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* 履歴アイテム内のラベル */
+.history-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.history-label-margin {
+  margin-top: 15px;
+}
+
+/* 履歴アイテム内のpre */
+.history-pre {
+  margin: 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.history-pre-scrollable {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-pre-large {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* エラー表示 */
+.history-pre-error {
+  color: #d32f2f;
+}

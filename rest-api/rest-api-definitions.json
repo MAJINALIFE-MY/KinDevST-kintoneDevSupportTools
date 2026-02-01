@@ -1,0 +1,858 @@
+[
+  {
+    "category": "レコード - レコードの取得／登録／更新／削除",
+    "apis": [
+      {
+        "name": "GET /k/v1/record.json",
+        "displayName": "1件のレコードを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/record.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/get-record/",
+        "bodyPlaceholder": "{\"app\": 1, \"id\": 100}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/record.json",
+        "displayName": "1件のレコードを登録する",
+        "method": "POST",
+        "endpoint": "/k/v1/record.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/add-record/",
+        "bodyPlaceholder": "{\"app\": 1, \"record\": {\"文字列1行\": {\"value\": \"ABC\"}}}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/record.json",
+        "displayName": "1件のレコードを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/record.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/update-record/",
+        "bodyPlaceholder": "{\"app\": 1, \"id\": 1001, \"record\": {\"文字列1行_0\": {\"value\": \"ABC\"}}}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/records.json",
+        "displayName": "複数のレコードを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/records.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/get-records/",
+        "bodyPlaceholder": "{\"app\": 1, \"query\": \"更新日時 > \\\"2026-01-01T09:00:00+0900\\\" and 更新日時 < \\\"2026-01-25T10:00:00+0900\\\" order by レコード番号 asc limit 10 offset 1\", \"fields\": [\"レコード番号\", \"作成日時\", \"ドロップダウン\"]}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/records.json",
+        "displayName": "複数のレコードを登録する",
+        "method": "POST",
+        "endpoint": "/k/v1/records.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/add-records/",
+        "bodyPlaceholder": "{\"app\": 1, \"records\": [{\"文字列1行_0\": {\"value\": \"ABC\"}, \"文字列1行_1\": {\"value\": \"ABC\"}}, {\"文字列1行_0\": {\"value\": \"EFG\"}, \"文字列1行_1\": {\"value\": \"EFG\"}}]}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/records.json",
+        "displayName": "複数のレコードを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/records.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/update-records/",
+        "bodyPlaceholder": "{\"app\": 1001, \"upsert\": true, \"records\": [{\"id\": 1, \"record\": {\"文字列1行_0\": {\"value\": \"ABC\"}}}, {\"id\": 2, \"record\": {\"文字列1行_1\": {\"value\": \"DFG\"}}}]}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/records.json",
+        "displayName": "複数のレコードを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/records.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/delete-records/",
+        "bodyPlaceholder": "{\"app\": 1, \"ids\": [101, 102]}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/records/cursor.json",
+        "displayName": "（レコードの一括取得）カーソルを作成する",
+        "method": "POST",
+        "endpoint": "/k/v1/records/cursor.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/create-cursor/",
+        "bodyPlaceholder": "{\"app\": 1, \"fields\": [\"レコード番号\", \"作成者\", \"作成日時\"], \"query\": \"文字列__複数行_ like \\\"likeは小文字\\\" order by レコード番号 asc\", \"size\": 500}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/records/cursor.json",
+        "displayName": "（レコードの一括取得）カーソルからレコードを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/records/cursor.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/get-cursor/",
+        "bodyPlaceholder": "{\"id\": \"9a9716fe-1394-4677-a1c7-2199a5d28215\"}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/records/cursor.json",
+        "displayName": "（レコードの一括取得）カーソルを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/records/cursor.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/delete-cursor/",
+        "bodyPlaceholder": "{\"id\": \"9a9716fe-1394-4677-a1c7-2199a5d28215\"}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "レコード - レコードのコメントの操作",
+    "apis": [
+      {
+        "name": "GET /k/v1/record/comments.json",
+        "displayName": "レコードコメントを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/record/comments.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/get-comments/",
+        "bodyPlaceholder": "{\"app\": 1, \"record\": 1, \"order\": \"desc\", \"offset\": 0, \"limit\": 10}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/record/comment.json",
+        "displayName": "レコードコメントを投稿する",
+        "method": "POST",
+        "endpoint": "/k/v1/record/comment.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/add-comment/",
+        "bodyPlaceholder": "{\"app\": 100, \"record\": 4, \"comment\": {\"text\": \"システムからのコメントです。ご確認をお願いします。\", \"mentions\": [{\"code\": \"takahashi\", \"type\": \"USER\"}]}}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/record/comment.json",
+        "displayName": "レコードコメントを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/record/comment.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/delete-comment/",
+        "bodyPlaceholder": "{\"app\": 1, \"record\": 1, \"comment\": 1}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "レコード - プロセス管理の操作",
+    "apis": [
+      {
+        "name": "PUT /k/v1/record/assignees.json",
+        "displayName": "レコードの作業者を更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/record/assignees.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/update-assignees/",
+        "bodyPlaceholder": "{\"app\": 1, \"id\": 1, \"assignees\": [\"user2\"], \"revision\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/record/status.json",
+        "displayName": "1件のレコードのステータスを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/record/status.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/update-status/",
+        "bodyPlaceholder": "{\"action\": \"申請する\", \"app\": 1, \"assignee\": \"user2\", \"id\": 1, \"revision\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/records/status.json",
+        "displayName": "複数のレコードのステータスを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/records/status.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/update-statuses/",
+        "bodyPlaceholder": "{\"app\": 4, \"records\": [{\"id\": 1, \"action\": \"申請する\", \"assignee\": \"user2\", \"revision\": 1}, {\"id\": 2, \"action\": \"承認\"}]}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "レコード - その他",
+    "apis": [
+      {
+        "name": "POST /k/v1/bulkRequest.json",
+        "displayName": "複数アプリのレコード操作を一括処理する",
+        "method": "POST",
+        "endpoint": "/k/v1/bulkRequest.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/bulk-request/",
+        "bodyPlaceholder": "{\"requests\": [{\"method\": \"POST\", \"api\": \"/k/v1/record.json\", \"payload\": {\"app\": 1972, \"record\": {\"文字列1行\": {\"value\": \"文字列1行を追加します。\"}}}}, {\"method\": \"PUT\", \"api\": \"/k/v1/record.json\", \"payload\": {\"app\": 1973, \"id\": 33, \"revision\": 2, \"record\": {\"文字列1行\": {\"value\": \"文字列1行を更新します。\"}}}}]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/records/acl/evaluate.json",
+        "displayName": "APIを実行したユーザーのレコードのアクセス権の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/records/acl/evaluate.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/records/evaluate-record-permissions/",
+        "bodyPlaceholder": "{\"app\": 1, \"ids\": [1, 2]}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "ファイル",
+    "apis": [
+      {
+        "name": "GET /k/v1/file.json",
+        "displayName": "【制限有】ファイルをダウンロードする",
+        "method": "GET",
+        "endpoint": "/k/v1/file.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/files/download-file/",
+        "bodyPlaceholder": "{\"fileKey\": \"201201e271307126747563577E9431C85B3B26D4AFB1509193\"}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/file.json",
+        "displayName": "【動作確認中】ファイルをアップロードする",
+        "method": "POST",
+        "endpoint": "/k/v1/file.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/files/upload-file/",
+        "bodyPlaceholder": "※このAPIはmultipart/form-data形式です。Bodyフィールドは使用できません。",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリ情報",
+    "apis": [
+      {
+        "name": "GET /k/v1/app.json",
+        "displayName": "1件のアプリの情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/get-app/",
+        "bodyPlaceholder": "{\"id\": 1}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/apps.json",
+        "displayName": "複数のアプリの情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/apps.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/get-apps/",
+        "bodyPlaceholder": "{\"ids\": [1, 2], \"codes\": [\"FOO\", \"BAR\"], \"name\": \"TEST\", \"spaceIds\": [100], \"offset\": 0, \"limit\": 100}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/preview/app.json",
+        "displayName": "動作テスト環境にアプリを作成する",
+        "method": "POST",
+        "endpoint": "/k/v1/preview/app.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/add-app/",
+        "bodyPlaceholder": "{\"name\": \"案件管理\", \"space\": 1001, \"thread\": 1001}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/apps/statistics.json",
+        "displayName": "アプリの使用状況を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/apps/statistics.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/get-apps-statistics/",
+        "bodyPlaceholder": "{\"offset\": 0, \"limit\": 1}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/adminNotes.json",
+        "displayName": "アプリ管理者用メモを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/adminNotes.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/get-app-admin-notes/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/adminNotes.json",
+        "displayName": "アプリ管理者用メモを変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/adminNotes.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/update-app-admin-notes/",
+        "bodyPlaceholder": "{\"app\": 1, \"content\": \"<div>管理者用メモ</div>\", \"includeInTemplateAndDuplicates\": false, \"revision\": 2}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - フォーム",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/form/fields.json",
+        "displayName": "フィールドを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/form/fields.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/get-form-fields/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/preview/app/form/fields.json",
+        "displayName": "フィールドを追加する",
+        "method": "POST",
+        "endpoint": "/k/v1/preview/app/form/fields.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/add-form-fields/",
+        "bodyPlaceholder": "{\"app\": 1, \"revision\": 2, \"properties\": {\"文字列1行\": {\"type\": \"SINGLE_LINE_TEXT\", \"code\": \"文字列1行\", \"label\": \"文字列 (1行)\", \"noLabel\": false, \"required\": false, \"unique\": false}}}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/form/fields.json",
+        "displayName": "フィールドの設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/form/fields.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/update-form-fields/",
+        "bodyPlaceholder": "{\"app\": 1, \"revision\": 2, \"properties\": {\"文字列1行_0\": {\"type\": \"SINGLE_LINE_TEXT\", \"code\": \"文字列1行_0\", \"label\": \"文字列1行\", \"noLabel\": false, \"required\": false, \"unique\": false}}}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/preview/app/form/fields.json",
+        "displayName": "フィールドを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/preview/app/form/fields.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/delete-form-fields/",
+        "bodyPlaceholder": "{\"app\": 1, \"revision\": 2, \"fields\": [\"文字列1行_0\", \"数値\"]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/form/layout.json",
+        "displayName": "フォームのレイアウトを取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/form/layout.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/get-form-layout/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/form/layout.json",
+        "displayName": "フォームのレイアウトを変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/form/layout.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/update-form-layout/",
+        "bodyPlaceholder": "{\"app\": 1, \"revision\": 2, \"layout\": [{\"type\": \"ROW\", \"fields\": [{\"type\": \"SINGLE_LINE_TEXT\", \"code\": \"文字列1行_0\", \"size\": {\"width\": 200}}, {\"type\": \"MULTI_LINE_TEXT\", \"code\": \"文字列複数行_0\", \"size\": {\"width\": 200, \"innerHeight\": 100}}]}]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/form.json",
+        "displayName": "フォームの設計情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/form.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/form/get-form/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - 一覧",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/views.json",
+        "displayName": "一覧の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/views.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/view/get-views/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/views.json",
+        "displayName": "一覧の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/views.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/view/update-views/",
+        "bodyPlaceholder": "{\"app\": 18, \"views\": {\"一覧1\": {\"index\": \"0\", \"type\": \"LIST\", \"name\": \"一覧1\", \"fields\": [\"レコード番号\", \"文字列__1行_\"], \"filterCond\": \"更新日時 > \\\"2012-02-03T09:00:00Z\\\" and 更新日時< \\\"2012-02-03T10:00:00Z\\\"\", \"sort\": \"レコード番号 asc\"}}}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - グラフ",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/reports.json",
+        "displayName": "アプリのグラフの設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/reports.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/report/get-graph-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/reports.json",
+        "displayName": "アプリのグラフ設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/reports.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/report/update-graph-settings/",
+        "bodyPlaceholder": "{\"app\": \"1\", \"reports\": {\"初期設定\": {\"chartType\": \"BAR\", \"chartMode\": \"NORMAL\", \"name\": \"初期設定\", \"index\": \"0\", \"groups\": [{\"code\": \"ラジオボタン\"}], \"aggregations\": [{\"type\": \"COUNT\"}], \"filterCond\": \"\", \"sorts\": [{\"by\": \"TOTAL\", \"order\": \"DESC\"}]}}, \"revision\": \"2\"}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリの設定 - 一般設定",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/settings.json",
+        "displayName": "アプリの一般設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/settings.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-general-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/settings.json",
+        "displayName": "アプリの一般設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/settings.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-general-settings/",
+        "bodyPlaceholder": "{\"app\": 21, \"name\": \"案件管理\", \"revision\": -1}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/status.json",
+        "displayName": "プロセス管理の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/status.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-process-management-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/status.json",
+        "displayName": "プロセス管理の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/status.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-process-management-settings/",
+        "bodyPlaceholder": "{\"app\": \"5\", \"enable\": true, \"states\": {\"未処理\": {\"name\": \"未処理\", \"index\": \"0\", \"assignee\": {\"type\": \"ONE\", \"entities\": []}}, \"処理中\": {\"name\": \"処理中\", \"index\": \"1\", \"assignee\": {\"type\": \"ALL\", \"entities\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}}]}}, \"完了\": {\"name\": \"完了\", \"index\": \"2\", \"assignee\": {\"type\": \"ONE\", \"entities\": []}}}, \"actions\": [{\"name\": \"処理開始\", \"from\": \"未処理\", \"to\": \"処理中\", \"filterCond\": \"\", \"type\": \"PRIMARY\"}, {\"name\": \"完了する\", \"from\": \"処理中\", \"to\": \"完了\", \"filterCond\": \"\", \"type\": \"PRIMARY\"}], \"revision\": \"3\"}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/preview/app/deploy.json",
+        "displayName": "アプリの設定の運用環境への反映状況を確認する",
+        "method": "GET",
+        "endpoint": "/k/v1/preview/app/deploy.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-app-deploy-status/",
+        "bodyPlaceholder": "{\"apps\": [8, 9, 10]}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/preview/app/deploy.json",
+        "displayName": "アプリの設定を運用環境へ反映する",
+        "method": "POST",
+        "endpoint": "/k/v1/preview/app/deploy.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/deploy-app-settings/",
+        "bodyPlaceholder": "{\"apps\": [{\"app\": 1, \"revision\": 13}, {\"app\": 9, \"revision\": 5}, {\"app\": 10, \"revision\": 11}], \"revert\": false}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリの設定 - カスタマイズ／サービス連携",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/plugins.json",
+        "displayName": "アプリに追加されているプラグインの一覧を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/plugins.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-app-plugins/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/preview/app/plugins.json",
+        "displayName": "アプリにプラグインを追加する",
+        "method": "POST",
+        "endpoint": "/k/v1/preview/app/plugins.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/add-app-plugins/",
+        "bodyPlaceholder": "{\"app\": 2, \"ids\": [\"djmhffjhfgmebgnmcggopedaofckljlj\"]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/customize.json",
+        "displayName": "JavaScript / CSSカスタマイズ設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/customize.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-customization/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/customize.json",
+        "displayName": "JavaScript / CSSカスタマイズ設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/customize.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-customization/",
+        "bodyPlaceholder": "{\"app\": 21, \"scope\": \"ALL\", \"desktop\": {\"js\": [{\"type\": \"URL\", \"url\": \"https://www.example.com/example.js\"}], \"css\": []}, \"mobile\": {\"js\": [], \"css\": []}}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリの設定 - 通知",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/notifications/general.json",
+        "displayName": "アプリの条件通知の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/notifications/general.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-general-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/notifications/general.json",
+        "displayName": "アプリの条件通知の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/notifications/general.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-general-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1, \"notifications\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}, \"recordAdded\": true, \"recordEdited\": true, \"commentAdded\": false, \"statusChanged\": false, \"fileImported\": true}], \"notifyToCommenter\": true}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/notifications/perRecord.json",
+        "displayName": "レコードの条件通知の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/notifications/perRecord.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-per-record-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/notifications/perRecord.json",
+        "displayName": "レコードの条件通知の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/notifications/perRecord.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-per-record-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1, \"notifications\": [{\"filterCond\": \"ユーザー選択フィールド in (\\\"user1\\\")\", \"title\": \"user1が選択されました\", \"targets\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}}]}], \"revision\": 2}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/app/notifications/reminder.json",
+        "displayName": "リマインダーの条件通知の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/notifications/reminder.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-reminder-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/notifications/reminder.json",
+        "displayName": "リマインダーの条件通知の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/notifications/reminder.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-reminder-notification-settings/",
+        "bodyPlaceholder": "{\"app\": 1, \"notifications\": [{\"timing\": {\"code\": \"作成日時\", \"daysLater\": \"1\", \"hoursLater\": \"2\"}, \"filterCond\": \"ユーザー選択フィールド in (\\\"user1\\\")\", \"title\": \"リマインドです\", \"targets\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}, \"includeSubs\": false}]}], \"timezone\": \"Asia/Tokyo\"}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリの設定 - アクセス権",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/acl.json",
+        "displayName": "アプリのアクセス権の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-app-permissions/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/app/acl.json",
+        "displayName": "アプリのアクセス権の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/app/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-app-permissions/",
+        "bodyPlaceholder": "{\"app\": 1, \"rights\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}, \"appEditable\": true, \"recordViewable\": true, \"recordAddable\": true, \"recordEditable\": true, \"recordDeletable\": true, \"recordImportable\": true, \"recordExportable\": true}, {\"entity\": {\"type\": \"CREATOR\"}, \"appEditable\": true, \"recordViewable\": true, \"recordAddable\": true, \"recordEditable\": true, \"recordDeletable\": true, \"recordImportable\": true, \"recordExportable\": true}]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/record/acl.json",
+        "displayName": "レコードのアクセス権の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/record/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-record-permissions/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/record/acl.json",
+        "displayName": "レコードのアクセス権の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/record/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-record-permissions/",
+        "bodyPlaceholder": "{\"app\": 1, \"rights\": [{\"entities\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}, \"viewable\": true, \"editable\": false, \"deletable\": false}]}]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/field/acl.json",
+        "displayName": "フィールドのアクセス権の設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/field/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-field-permissions/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/field/acl.json",
+        "displayName": "フィールドのアクセス権の設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/field/acl.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-field-permissions/",
+        "bodyPlaceholder": "{\"app\": 1, \"rights\": [{\"code\": \"文字列1行\", \"entities\": [{\"accessibility\": \"READ\", \"entity\": {\"type\": \"USER\", \"code\": \"user1\"}}]}]}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - アプリの設定 - その他の設定",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/actions.json",
+        "displayName": "アプリのアクション設定を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/actions.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/get-action-settings/",
+        "bodyPlaceholder": "{\"app\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/actions.json",
+        "displayName": "アプリのアクション設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/actions.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-action-settings/",
+        "bodyPlaceholder": "{\"app\": 1, \"actions\": {\"注文管理に登録\": {\"name\": \"注文管理に登録\", \"index\": \"0\", \"destApp\": {\"code\": \"INVOICE\"}, \"mappings\": [{\"srcType\": \"FIELD\", \"srcField\": \"CompanyName\", \"destField\": \"CompanyName\"}, {\"srcType\": \"RECORD_URL\", \"destField\": \"URL\"}], \"entities\": [{\"type\": \"USER\", \"code\": \"userA\"}], \"filterCond\": \"OrderDate = TODAY()\"}}}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "アプリ - 運用管理",
+    "apis": [
+      {
+        "name": "POST /k/v1/app/move.json",
+        "displayName": "アプリの所属するスペースを変更する",
+        "method": "POST",
+        "endpoint": "/k/v1/app/move.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/move-app/",
+        "bodyPlaceholder": "{\"app\": 1, \"space\": 5}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "スペース - スペース",
+    "apis": [
+      {
+        "name": "GET /k/v1/space.json",
+        "displayName": "スペースの情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/space.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/get-space/",
+        "bodyPlaceholder": "{\"id\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/space.json",
+        "displayName": "スペースの設定を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/space.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-space/",
+        "bodyPlaceholder": "{\"id\": 1, \"name\": \"スペース名\"}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/template/space.json",
+        "displayName": "テンプレートからスペースを作成する",
+        "method": "POST",
+        "endpoint": "/k/v1/template/space.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/add-space-from-template/",
+        "bodyPlaceholder": "{\"id\": 1, \"name\": \"スペース名\", \"members\": [{\"entity\": {\"type\": \"LOGINNAME\", \"code\": \"user1\"}, \"isAdmin\": true}]}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/space.json",
+        "displayName": "スペースを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/space.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/delete-space/",
+        "bodyPlaceholder": "{\"id\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/space/body.json",
+        "displayName": "スペースの本文を更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/space/body.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-space-body/",
+        "bodyPlaceholder": "{\"id\": 1, \"body\": \"<b>総務課</b>専用のスペースです。\"}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/space/members.json",
+        "displayName": "スペースのメンバーとスペース管理者の情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/space/members.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/get-space-members/",
+        "bodyPlaceholder": "{\"id\": 1}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/space/members.json",
+        "displayName": "スペースのメンバーを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/space/members.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-space-members/",
+        "bodyPlaceholder": "{\"id\": 1, \"members\": [{\"entity\": {\"type\": \"USER\", \"code\": \"user1\"}, \"isAdmin\": true}, {\"entity\": {\"type\": \"GROUP\", \"code\": \"group1\"}, \"isAdmin\": false}, {\"entity\": {\"type\": \"ORGANIZATION\", \"code\": \"org1\"}, \"isAdmin\": false, \"includeSubs\": true}]}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/spaces/statistics.json",
+        "displayName": "(WIDE)スペースの使用状況を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/spaces/statistics.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/get-spaces-statistics/",
+        "bodyPlaceholder": "{\"offset\": 0, \"limit\": 1}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "スペース - スレッド",
+    "apis": [
+      {
+        "name": "POST /k/v1/space/thread.json",
+        "displayName": "スペースのスレッドを作成する",
+        "method": "POST",
+        "endpoint": "/k/v1/space/thread.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/add-thread/",
+        "bodyPlaceholder": "{\"space\": 1, \"name\": \"サンプルスレッド\"}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/space/thread.json",
+        "displayName": "スペースのスレッドを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/space/thread.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-thread/",
+        "bodyPlaceholder": "{\"id\": 1, \"name\": \"スレッド名(省略可)\", \"body\": \"<b>総務課</b>の連絡用スレッドです。\"}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/space/thread/comment.json",
+        "displayName": "スペースのスレッドにコメントを投稿する",
+        "method": "POST",
+        "endpoint": "/k/v1/space/thread/comment.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/add-thread-comment/",
+        "bodyPlaceholder": "{\"space\": 1, \"thread\": 1, \"comment\": {\"text\": \"内容を確認しました。\\n○○○○○○○。\", \"mentions\": [{\"code\": \"LOGINNAME\", \"type\": \"USER\"}]}}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "スペース - ゲストユーザーとゲストスペース",
+    "apis": [
+      {
+        "name": "POST /k/v1/guests.json",
+        "displayName": "ゲストユーザーを追加する",
+        "method": "POST",
+        "endpoint": "/k/v1/guests.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/add-guests/",
+        "bodyPlaceholder": "{\"guests\": [{\"code\": \"hoge@example.com\", \"password\": \"p@ssword1\", \"timezone\": \"Asia/Tokyo\", \"name\": \"金 頓\"}]}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/guests.json",
+        "displayName": "ゲストユーザーを削除する",
+        "method": "DELETE",
+        "endpoint": "/k/v1/guests.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/delete-guests/",
+        "bodyPlaceholder": "{\"guests\": [\"guest1@example.com\", \"guest2@example.com\", \"guest3@example.com\"]}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/guest/GUEST_SPACE_ID/v1/space/guests.json",
+        "displayName": "ゲストスペースのゲストメンバーを更新する",
+        "method": "PUT",
+        "endpoint": "/k/guest/GUEST_SPACE_ID/v1/space/guests.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-guest-members/",
+        "bodyPlaceholder": "{\"id\": 1, \"guests\": [\"guest1@example.com\", \"guest2@example.com\", \"guest3@example.com\"]}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "プラグイン",
+    "apis": [
+      {
+        "name": "GET /k/v1/plugins.json",
+        "displayName": "インストール済みのプラグインの一覧を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/plugins.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/get-plugins/",
+        "bodyPlaceholder": "{\"offset\": 0, \"limit\": 100}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/plugins/required.json",
+        "displayName": "インストールが必要なプラグインの一覧を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/plugins/required.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/get-required-plugins/",
+        "bodyPlaceholder": "{\"offset\": 1, \"limit\": 1}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/plugin/apps.json",
+        "displayName": "プラグインを追加しているアプリの一覧を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/plugin/apps.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/get-plugin-apps/",
+        "bodyPlaceholder": "{\"id\": \"djmhffjhfgmebgnmcggopedaofckljlj\", \"offset\": 1, \"limit\": 1}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/plugin.json",
+        "displayName": "【制限有】プラグインを読み込む",
+        "method": "POST",
+        "endpoint": "/k/v1/plugin.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/add-plugin/",
+        "bodyPlaceholder": "{\"fileKey\": \"c15b3870-7505-4ab6-9d8d-b9bdbc74f5d6\"}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/plugin.json",
+        "displayName": "【制限有】プラグインを更新する",
+        "method": "PUT",
+        "endpoint": "/k/v1/plugin.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/update-plugin/",
+        "bodyPlaceholder": "{\"id\": \"djmhffjhfgmebgnmcggopedaofckljlj\", \"fileKey\": \"c15b3870-7505-4ab6-9d8d-b9bdbc74f5d6\"}",
+        "args": []
+      },
+      {
+        "name": "DELETE /k/v1/plugin.json",
+        "displayName": "プラグインをアンインストールする",
+        "method": "DELETE",
+        "endpoint": "/k/v1/plugin.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/plugins/delete-plugin/",
+        "bodyPlaceholder": "{\"id\": \"djmhffjhfgmebgnmcggopedaofckljlj\"}",
+        "args": []
+      }
+    ]
+  },
+  {
+    "category": "API情報",
+    "apis": [
+      {
+        "name": "GET /k/v1/apis.json",
+        "displayName": "kintone REST APIの一覧を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/apis.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apis/get-apis/",
+        "bodyPlaceholder": "{}",
+        "args": []
+      },
+      {
+        "name": "GET /k/v1/apis/*.json",
+        "displayName": "【動作不可】kintone REST APIのスキーマ情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/apis/*.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apis/get-api-schema/",
+        "bodyPlaceholder": "{}",
+        "args": []
+      }
+    ]
+  }
+]

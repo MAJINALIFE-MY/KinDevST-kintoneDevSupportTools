@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KinDevST</title>
+  <link rel="stylesheet" href="sidepanel.css">
+  <!-- Select2 CSS -->
+  <link rel="stylesheet" href="lib/select2.min.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- タブメニュー -->
+    <div class="tabs">
+      <button class="tab-button active" data-tab="rest">REST API</button>
+      <button class="tab-button" data-tab="js">JS API</button>
+      <button class="tab-button" data-tab="config">Setting</button>
+    </div>
+
+    <!-- REST API タブ -->
+    <div id="rest" class="tab-content active">
+      <div class="form-group">
+        <label>表示名</label>
+        <select id="rest-api-selector-display">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>API</label>
+        <select id="rest-api-selector-name">
+        </select>
+        <div id="rest-api-doc-link" class="doc-link">
+          <a href="#" target="_blank">📖 ドキュメントを開く</a>
+        </div>
+      </div>
+      
+      <!-- API選択時の情報表示 -->
+      <div id="rest-api-info-display" class="api-info-display hidden">
+        <div class="api-info-row">
+          <span class="api-info-label">Method:</span>
+          <span class="api-method"></span>
+        </div>
+        <div class="api-info-row">
+          <span class="api-info-label">Endpoint:</span>
+          <span class="api-endpoint"></span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Body(JSON) / Query Parameters</label>
+        <textarea id="rest-body" placeholder=""></textarea>
+        <small class="help-text">※GET/DELETEの場合はクエリパラメータ、POST/PUTの場合はボディとして使用</small>
+      </div>
+      <button id="rest-exec-btn" class="primary-btn">実行(REST)</button>
+      
+      <!-- 履歴表示エリア -->
+      <div id="rest-history-container" class="history-container">
+        <div id="rest-history-list">
+          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- JS API タブ -->
+    <div id="js" class="tab-content">
+      <div class="form-group">
+        <label>表示名</label>
+        <select id="js-api-selector-display">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>API名</label>
+        <select id="js-api-selector-name">
+        </select>
+        <div id="js-api-doc-link" class="doc-link">
+          <a href="#" target="_blank">📖 ドキュメントを開く</a>
+        </div>
+      </div>
+      
+      <!-- 動的引数入力エリア -->
+      <div id="js-args-container">
+        <!-- JSで動的に生成 -->
+      </div>
+      
+      <button id="js-exec-btn" class="primary-btn">実行(JS API)</button>
+      
+      <!-- 履歴表示エリア -->
+      <div id="js-history-container" class="history-container">
+        <div id="js-history-list">
+          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setting タブ -->
+    <div id="config" class="tab-content">
+      <!-- タブ設定 -->
+      <div class="tab-settings-section">
+        <h3 class="section-title">タブ設定</h3>
+        <div class="form-group">
+          <p class="auth-description">他のサイトのタブを開いていても、記憶したkintoneタブを使用してAPIを実行できます。</p>
+          <button id="save-tab-btn" class="secondary-btn">現在開いているタブを記憶</button>
+        </div>
+        <p id="tab-message" class="save-message">保存しました</p>
+        <div id="tab-info-display" class="auth-method-section hidden">
+          <div class="form-group">
+            <div class="label-with-button">
+              <label>記憶中のタブ</label>
+              <button class="history-delete-btn" id="clear-tab-btn" title="記憶を削除">×</button>
+            </div>
+            <div class="tab-info-content">
+              <div class="tab-info-title"></div>
+              <div class="tab-info-url"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REST API設定 -->
+      <div class="rest-api-settings-section">
+        <h3 class="section-title">REST API設定</h3>
+        
+        <!-- 認証設定 -->
+        <div class="auth-settings-subsection">
+          <h4 class="subsection-title">認証設定</h4>
+          <div class="form-group">
+            <label>認証方式</label>
+            <select id="auth-type">
+              <option value="password">パスワード認証</option>
+              <option value="token">APIトークン</option>
+              <option value="oauth">OAuth</option>
+              <option value="session">セッション認証(Cookie)</option>
+            </select>
+          </div>
+          
+          <!-- セキュリティ注意書き -->
+          <div class="form-group">
+            <small class="help-text" style="color: #666; font-style: italic;">
+              ※パスワード等の認証情報は15分間無操作、または画面ロック時に自動削除されます
+            </small>
+          </div>
+          
+          <!-- パスワード認証 -->
+          <div id="auth-password" class="auth-method-section">
+            <div class="form-group">
+              <label>ログイン名</label>
+              <input type="text" id="auth-user">
+            </div>
+            <div class="form-group">
+              <label>パスワード</label>
+              <input type="password" id="auth-pass">
+            </div>
+          </div>
+          
+          <!-- APIトークン -->
+          <div id="auth-token" class="auth-method-section">
+            <div class="form-group">
+              <label>APIトークン</label>
+              <input type="password" id="auth-api-token">
+            </div>
+          </div>
+          
+          <!-- OAuth -->
+          <div id="auth-oauth" class="auth-method-section">
+            <div class="form-group">
+              <label>Client ID</label>
+              <input type="text" id="oauth-client-id">
+            </div>
+            <div class="form-group">
+              <label>Client Secret</label>
+              <input type="password" id="oauth-client-secret">
+            </div>
+            <div class="form-group">
+              <label>Redirect URI(Copy this)</label>
+              <input type="text" id="oauth-redirect-uri" readonly>
+            </div>
+          </div>
+          
+          <!-- セッション認証 -->
+          <div id="auth-session" class="auth-method-section">
+            <p class="auth-description">現在ブラウザでログインしているセッションを利用します。設定は不要です。</p>
+          </div>
+        </div>
+
+        <!-- 表示設定 -->
+        <div class="display-settings-subsection">
+          <h4 class="subsection-title">表示設定 ログ</h4>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-copy-button" checked>
+              コピーボタンを表示
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-rerun-button" checked>
+              再実行ボタンを表示
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-delete-button" checked>
+              削除ボタンを表示
+            </label>
+          </div>
+          <h4 class="subsection-title">表示設定 REST API</h4>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-request-headers" checked>
+              Request Headers を表示
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-status-code" checked>
+              Status Code を表示
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-response-headers" checked>
+              Response Headers を表示
+            </label>
+          </div>
+
+          <small class="help-text-block">※Response Bodyは常に表示されます</small>
+        </div>
+        
+        <!-- 開発者向け設定 -->
+        <div class="display-settings-subsection">
+          <h4 class="subsection-title">開発者向け設定</h4>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="show-execution-log">
+              実行ログを表示（DevTools Console）
+            </label>
+          </div>
+          <small class="help-text-block">※有効にすると、API実行時のログがブラウザのコンソールに出力されます。エラーと警告は常に出力されます。</small>
+        </div>
+      </div>
+
+      <!-- 履歴設定 -->
+      <div class="history-settings-section">
+        <h3 class="section-title">履歴設定</h3>
+        <div class="form-group">
+          <label>実行結果の履歴保存数</label>
+          <input type="number" id="history-limit" min="1" max="30" value="10">
+          <small class="help-text-block">※最大30件まで保存できます（1-30の範囲で設定）</small>
+        </div>
+      </div>
+
+      <!-- 設定保存 -->
+      <div class="settings-save-section">
+        <button id="save-config-btn" class="primary-btn">設定を保存</button>
+        <p id="config-message" class="save-message">保存しました</p>
+      </div>
+    </div>
+  </div>
+  <!-- jQuery -->
+  <script src="lib/jquery-4.0.0.min.js"></script>
+  <!-- Select2 JS -->
+  <script src="lib/select2.min.js"></script>
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>
