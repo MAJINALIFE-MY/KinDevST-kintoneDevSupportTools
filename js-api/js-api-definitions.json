@@ -810,7 +810,7 @@
       },
       {
         "name": "kintone.app.record.isFieldVisible(fieldCode)",
-        "displayName": "【動作確認中】フィールドの表示／非表示の状態を取得する",
+        "displayName": "フィールドの表示／非表示の状態を取得する",
         "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/is-field-visible/",
         "args": [
           {
@@ -835,6 +835,48 @@
             "placeholder": "group_field"
           }
         ]
+      }
+    ]
+  },
+  {
+    "category": "フィールドのスタイル設定",
+    "apis": [
+      {
+        "name": "kintone.app.record.setFieldStyle(fieldCode, config)",
+        "displayName": "フィールドのスタイルの設定",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/set-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを設定するフィールドのフィールドコード",
+            "placeholder": "field_code"
+          },
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "スタイルの設定オブジェクト。DEFAULTを指定するとすべてのスタイルの適用が解除されます。content（コンテンツ）、background（背景）、label（フィールド名）のスタイルを指定できます。",
+            "placeholder": "{\"content\": {\"backgroundColor\": \"#95d542\", \"fontWeight\": \"bold\"}, \"label\": {\"color\": \"#ff4949\"}}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.record.getFieldStyle(fieldCode)",
+        "displayName": "フィールドのスタイルの取得",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを取得するフィールドのフィールドコード",
+            "placeholder": "field_code"
+          }
+        ],
+        "returnsPromise": true
       }
     ]
   },
@@ -1071,7 +1113,7 @@
       },
       {
         "name": "kintone.app.record.showChangeAssigneeButton(state)",
-        "displayName": "【動作確認中】「現在の作業者を変更」ボタンの表示／非表示を切り替える",
+        "displayName": "「現在の作業者を変更」ボタンの表示／非表示を切り替える",
         "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-change-assignee-button/",
         "args": [
           {
