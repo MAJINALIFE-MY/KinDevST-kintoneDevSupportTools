@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "KinDevST - kintone Developer Support Tool",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "kintoneのセッション認証を利用してREST API・JS APIを実行する開発者向けChrome拡張機能",
   "permissions": [
     "sidePanel",

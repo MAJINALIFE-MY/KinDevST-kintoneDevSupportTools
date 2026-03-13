@@ -146,6 +146,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // 設定保存ボタンのセットアップ
   setupConfigSaveButtons();
+
+  // API名コピーボタンのセットアップ
+  setupApiNameCopyButtons();
   
   // タブ記憶機能のセットアップ
   setupTabMemory();
@@ -235,6 +238,14 @@ async function loadConfig() {
   // 実行ログ設定
   const showExecutionLogInput = document.getElementById(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG);
   if (showExecutionLogInput) showExecutionLogInput.checked = config.showExecutionLog;
+
+  // API名コピー形式設定
+  const copyIncludeDisplayNameInput = document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_DISPLAY_NAME);
+  const copyIncludeApiNameInput = document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_API_NAME);
+  const copyIncludeUrlInput = document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_URL);
+  if (copyIncludeDisplayNameInput) copyIncludeDisplayNameInput.checked = config.copyIncludeDisplayName !== false;
+  if (copyIncludeApiNameInput) copyIncludeApiNameInput.checked = config.copyIncludeApiName !== false;
+  if (copyIncludeUrlInput) copyIncludeUrlInput.checked = config.copyIncludeUrl !== false;
 }
 
 /**
@@ -271,6 +282,13 @@ function setupConfigSaveButtons() {
       
       // 実行ログ設定
       const showExecutionLog = document.getElementById(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG)?.checked ?? false;
+
+      // API名コピー形式設定
+      const copyFormatConfig = {
+        copyIncludeDisplayName: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_DISPLAY_NAME)?.checked ?? true,
+        copyIncludeApiName: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_API_NAME)?.checked ?? true,
+        copyIncludeUrl: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_URL)?.checked ?? true
+      };
       
       // 履歴設定
       const historyLimitInput = document.getElementById(CONFIG_DOM_IDS.HISTORY_LIMIT);
@@ -280,6 +298,7 @@ function setupConfigSaveButtons() {
       await ConfigManager.saveRestApiDisplayConfig(displayConfig);
       await ConfigManager.saveButtonDisplayConfig(buttonDisplayConfig);
       await ConfigManager.saveExecutionLogEnabled(showExecutionLog);
+      await ConfigManager.saveCopyFormatConfig(copyFormatConfig);
       await ConfigManager.setHistoryLimit(historyLimit);
       await HistoryManager.trimToLimit();
       
@@ -288,6 +307,47 @@ function setupConfigSaveButtons() {
       await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
       
       showSaveMessage(CONFIG_DOM_IDS.CONFIG_MESSAGE);
+    });
+  }
+}
+
+/**
+ * API名コピーボタンをセットアップ
+ */
+function setupApiNameCopyButtons() {
+  const restCopyBtn = document.getElementById(REST_DOM_IDS.COPY_NAME_BTN);
+  const jsCopyBtn = document.getElementById(JS_DOM_IDS.COPY_NAME_BTN);
+
+  async function copyApiName(apiName, definitionManager, buttonEl) {
+    if (!apiName) return;
+    const definition = definitionManager.getDefinition(apiName);
+    if (!definition) return;
+    const format = await ConfigManager.getCopyFormatConfig();
+    const parts = [];
+    if (format.copyIncludeDisplayName && definition.displayName) parts.push(definition.displayName);
+    if (format.copyIncludeApiName) parts.push(definition.name || apiName);
+    if (format.copyIncludeUrl && definition.docUrl) parts.push(definition.docUrl);
+    const text = parts.length > 0 ? parts.join('：') : (definition.name || apiName);
+    await navigator.clipboard.writeText(text);
+    if (buttonEl) {
+      const originalLabel = buttonEl.textContent;
+      buttonEl.textContent = 'コピーしました';
+      setTimeout(() => {
+        buttonEl.textContent = originalLabel;
+      }, TIMING.BUTTON_FEEDBACK_DISPLAY);
+    }
+  }
+
+  if (restCopyBtn) {
+    restCopyBtn.addEventListener('click', async () => {
+      const apiName = restApiSelector.getSelectedApiName();
+      await copyApiName(apiName, restApiDefinitionManager, restCopyBtn);
+    });
+  }
+  if (jsCopyBtn) {
+    jsCopyBtn.addEventListener('click', async () => {
+      const apiName = jsApiSelector.getSelectedApiName();
+      await copyApiName(apiName, jsApiDefinitionManager, jsCopyBtn);
     });
   }
 }

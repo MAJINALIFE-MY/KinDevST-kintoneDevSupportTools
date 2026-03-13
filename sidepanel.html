@@ -30,6 +30,7 @@
         </select>
         <div id="rest-api-doc-link" class="doc-link">
           <a href="#" target="_blank">📖 ドキュメントを開く</a>
+          <button type="button" id="rest-api-copy-name-btn" class="api-copy-name-btn">API名をコピー</button>
         </div>
       </div>
       
@@ -73,6 +74,7 @@
         </select>
         <div id="js-api-doc-link" class="doc-link">
           <a href="#" target="_blank">📖 ドキュメントを開く</a>
+          <button type="button" id="js-api-copy-name-btn" class="api-copy-name-btn">API名をコピー</button>
         </div>
       </div>
       
@@ -183,6 +185,25 @@
 
         <!-- 表示設定 -->
         <div class="display-settings-subsection">
+          <h4 class="subsection-title">API名コピー時の形式</h4>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="copy-include-display-name" checked>
+              表示名
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="copy-include-api-name" checked>
+              API名
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="copy-include-url" checked>
+              URL
+            </label>
+          </div>
           <h4 class="subsection-title">表示設定 ログ</h4>
           <div class="form-group">
             <label class="checkbox-label">

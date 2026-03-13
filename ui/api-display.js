@@ -47,7 +47,7 @@ export function updateDocLink(docLinkDiv, docUrl) {
       docLinkA.style.color = '';
       docLinkA.style.textDecoration = '';
       docLinkA.style.cursor = '';
-      docLinkDiv.style.display = 'block';
+      docLinkDiv.style.display = 'flex';
     } else {
       // 無効なURLの場合はリンクを無効化
       console.warn('[KinDevST] 無効なURLが検出されました:', docUrl);
@@ -57,7 +57,7 @@ export function updateDocLink(docLinkDiv, docUrl) {
       docLinkA.style.color = '#999';
       docLinkA.style.textDecoration = 'none';
       docLinkA.style.cursor = 'default';
-      docLinkDiv.style.display = 'block';
+      docLinkDiv.style.display = 'flex';
     }
   } else if (docUrl && docUrl.startsWith('//Todo:')) {
     // Todoコメントの場合はテキストとして表示
@@ -67,7 +67,7 @@ export function updateDocLink(docLinkDiv, docUrl) {
     docLinkA.style.color = '#999';
     docLinkA.style.textDecoration = 'none';
     docLinkA.style.cursor = 'default';
-    docLinkDiv.style.display = 'block';
+    docLinkDiv.style.display = 'flex';
   } else {
     docLinkDiv.style.display = 'none';
   }

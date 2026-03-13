@@ -22,6 +22,9 @@ export const STORAGE_KEYS = {
   SHOW_RERUN_BUTTON: 'showRerunButton',
   SHOW_DELETE_BUTTON: 'showDeleteButton',
   SHOW_EXECUTION_LOG: 'showExecutionLog',
+  COPY_INCLUDE_DISPLAY_NAME: 'copyIncludeDisplayName',
+  COPY_INCLUDE_API_NAME: 'copyIncludeApiName',
+  COPY_INCLUDE_URL: 'copyIncludeUrl',
   KINTONE_TAB_ID: 'kintoneTabId',
   KINTONE_TAB_INFO: 'kintoneTabInfo'
 };
@@ -60,6 +63,7 @@ export const REST_DOM_IDS = {
   SELECTOR_DISPLAY: 'rest-api-selector-display',
   SELECTOR_NAME: 'rest-api-selector-name',
   DOC_LINK: 'rest-api-doc-link',
+  COPY_NAME_BTN: 'rest-api-copy-name-btn',
   INFO_DISPLAY: 'rest-api-info-display',
   BODY: 'rest-body',
   EXEC_BTN: 'rest-exec-btn',
@@ -71,6 +75,7 @@ export const JS_DOM_IDS = {
   SELECTOR_DISPLAY: 'js-api-selector-display',
   SELECTOR_NAME: 'js-api-selector-name',
   DOC_LINK: 'js-api-doc-link',
+  COPY_NAME_BTN: 'js-api-copy-name-btn',
   ARGS_CONTAINER: 'js-args-container',
   EXEC_BTN: 'js-exec-btn',
   HISTORY_LIST: 'js-history-list'
@@ -93,6 +98,9 @@ export const CONFIG_DOM_IDS = {
   SHOW_RERUN_BUTTON: 'show-rerun-button',
   SHOW_DELETE_BUTTON: 'show-delete-button',
   SHOW_EXECUTION_LOG: 'show-execution-log',
+  COPY_INCLUDE_DISPLAY_NAME: 'copy-include-display-name',
+  COPY_INCLUDE_API_NAME: 'copy-include-api-name',
+  COPY_INCLUDE_URL: 'copy-include-url',
   SAVE_CONFIG_BTN: 'save-config-btn',
   SAVE_HISTORY_CONFIG_BTN: 'save-history-config-btn',
   CONFIG_MESSAGE: 'config-message',

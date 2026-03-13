@@ -125,7 +125,10 @@ export class ConfigManager {
           STORAGE_KEYS.SHOW_COPY_BUTTON,
           STORAGE_KEYS.SHOW_RERUN_BUTTON,
           STORAGE_KEYS.SHOW_DELETE_BUTTON,
-          STORAGE_KEYS.SHOW_EXECUTION_LOG
+          STORAGE_KEYS.SHOW_EXECUTION_LOG,
+          STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
+          STORAGE_KEYS.COPY_INCLUDE_API_NAME,
+          STORAGE_KEYS.COPY_INCLUDE_URL
         ], async (otherItems) => {
           resolve({
             // デフォルトはセッション認証（kintoneのCookieを使用）
@@ -145,10 +148,48 @@ export class ConfigManager {
             showCopyButton: otherItems[STORAGE_KEYS.SHOW_COPY_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_COPY_BUTTON] : true,
             showRerunButton: otherItems[STORAGE_KEYS.SHOW_RERUN_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_RERUN_BUTTON] : true,
             showDeleteButton: otherItems[STORAGE_KEYS.SHOW_DELETE_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_DELETE_BUTTON] : true,
-            showExecutionLog: otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] !== undefined ? otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] : false
+            showExecutionLog: otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] !== undefined ? otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] : false,
+            copyIncludeDisplayName: otherItems[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] : true,
+            copyIncludeApiName: otherItems[STORAGE_KEYS.COPY_INCLUDE_API_NAME] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_API_NAME] : true,
+            copyIncludeUrl: otherItems[STORAGE_KEYS.COPY_INCLUDE_URL] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_URL] : true
           });
         });
       });
+    });
+  }
+
+  /**
+   * API名コピー時の形式設定を取得
+   * @returns {Promise<Object>} コピー形式設定オブジェクト
+   */
+  static async getCopyFormatConfig() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([
+        STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
+        STORAGE_KEYS.COPY_INCLUDE_API_NAME,
+        STORAGE_KEYS.COPY_INCLUDE_URL
+      ], (items) => {
+        resolve({
+          copyIncludeDisplayName: items[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] : true,
+          copyIncludeApiName: items[STORAGE_KEYS.COPY_INCLUDE_API_NAME] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_API_NAME] : true,
+          copyIncludeUrl: items[STORAGE_KEYS.COPY_INCLUDE_URL] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_URL] : true
+        });
+      });
+    });
+  }
+
+  /**
+   * API名コピー時の形式設定を保存
+   * @param {Object} config - コピー形式設定オブジェクト
+   * @returns {Promise<void>}
+   */
+  static async saveCopyFormatConfig(config) {
+    return new Promise((resolve) => {
+      chrome.storage.local.set({
+        [STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME]: config.copyIncludeDisplayName,
+        [STORAGE_KEYS.COPY_INCLUDE_API_NAME]: config.copyIncludeApiName,
+        [STORAGE_KEYS.COPY_INCLUDE_URL]: config.copyIncludeUrl
+      }, resolve);
     });
   }
 
