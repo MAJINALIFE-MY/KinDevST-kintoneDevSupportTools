@@ -857,7 +857,7 @@
             "name": "config",
             "type": "object",
             "required": true,
-            "description": "スタイルの設定オブジェクト。DEFAULTを指定するとすべてのスタイルの適用が解除されます。content（コンテンツ）、background（背景）、label（フィールド名）のスタイルを指定できます。",
+            "description": "スタイルの設定オブジェクト。DEFAULTを指定するとすべてのスタイルの適用が解除されます。content（コンテンツ）、background（背景）、label（フィールド名）のスタイルを指定できます。レコード追加・編集・詳細・印刷画面で利用可能。",
             "placeholder": "{\"content\": {\"backgroundColor\": \"#95d542\", \"fontWeight\": \"bold\"}, \"label\": {\"color\": \"#ff4949\"}}"
           }
         ],
@@ -872,10 +872,37 @@
             "name": "fieldCode",
             "type": "string",
             "required": true,
-            "description": "スタイルを取得するフィールドのフィールドコード",
+            "description": "スタイルを取得するフィールドのフィールドコード。レコード追加・編集・詳細・印刷画面で利用可能。",
             "placeholder": "field_code"
           }
         ],
+        "returnsPromise": true
+      }
+    ]
+  },
+  {
+    "category": "レコード一覧のスタイル設定",
+    "apis": [
+      {
+        "name": "kintone.app.setRecordListStyle(config)",
+        "displayName": "レコード一覧の表のスタイルの設定",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record-list/set-record-list-style/",
+        "args": [
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "スタイルの設定オブジェクト。ヘッダーとボディのセルに対して背景色・文字色・太字・下線などのスタイルを設定できます。ヘッダー行・レコード詳細を開くボタン列・編集/削除ボタン列のスタイル変更も可能です。",
+            "placeholder": "{\"header\": {\"backgroundColor\": \"#ddeeff\"}, \"body\": {\"color\": \"#333333\"}}"
+          }
+        ],
+        "returnsPromise": true
+      },
+      {
+        "name": "kintone.app.getRecordListStyle()",
+        "displayName": "レコード一覧の表のスタイルの取得",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record-list/get-record-list-style/",
+        "args": [],
         "returnsPromise": true
       }
     ]
