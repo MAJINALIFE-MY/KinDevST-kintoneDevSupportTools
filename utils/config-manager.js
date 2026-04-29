@@ -17,12 +17,9 @@ export class ConfigManager {
    * @returns {Promise<number>} 履歴保存数
    */
   static async getHistoryLimit() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.HISTORY_LIMIT], (items) => {
-        const limit = items[STORAGE_KEYS.HISTORY_LIMIT] || HISTORY_CONFIG.DEFAULT_LIMIT;
-        resolve(Math.min(Math.max(HISTORY_CONFIG.MIN_LIMIT, limit), HISTORY_CONFIG.MAX_LIMIT));
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY_LIMIT]);
+    const limit = items[STORAGE_KEYS.HISTORY_LIMIT] ?? HISTORY_CONFIG.DEFAULT_LIMIT;
+    return Math.min(Math.max(HISTORY_CONFIG.MIN_LIMIT, limit), HISTORY_CONFIG.MAX_LIMIT);
   }
 
   /**
@@ -32,9 +29,7 @@ export class ConfigManager {
    */
   static async setHistoryLimit(limit) {
     const validLimit = Math.min(Math.max(HISTORY_CONFIG.MIN_LIMIT, limit), HISTORY_CONFIG.MAX_LIMIT);
-    return new Promise((resolve) => {
-      chrome.storage.local.set({ [STORAGE_KEYS.HISTORY_LIMIT]: validLimit }, resolve);
-    });
+    await chrome.storage.local.set({ [STORAGE_KEYS.HISTORY_LIMIT]: validLimit });
   }
 
   /**
@@ -42,41 +37,39 @@ export class ConfigManager {
    * @returns {Promise<Object>} 認証設定オブジェクト
    */
   static async getAuthConfig() {
-    return new Promise(async (resolve) => {
-      chrome.storage.session.get([
-        STORAGE_KEYS.AUTH_TYPE,
-        STORAGE_KEYS.AUTH_USER,
-        STORAGE_KEYS.AUTH_PASS,
-        STORAGE_KEYS.AUTH_API_TOKEN,
-        STORAGE_KEYS.OAUTH_CLIENT_ID,
-        STORAGE_KEYS.OAUTH_CLIENT_SECRET
-      ], async (items) => {
-        // デフォルトはセッション認証（kintoneのCookieを使用）
-        const authType = items[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION;
-        const config = { authType };
-        
-        switch (authType) {
-          case AUTH_TYPES.PASSWORD:
-            config.username = items[STORAGE_KEYS.AUTH_USER] ? await decrypt(items[STORAGE_KEYS.AUTH_USER]) : '';
-            config.password = items[STORAGE_KEYS.AUTH_PASS] ? await decrypt(items[STORAGE_KEYS.AUTH_PASS]) : '';
-            break;
-          case AUTH_TYPES.TOKEN:
-            config.apiToken = items[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(items[STORAGE_KEYS.AUTH_API_TOKEN]) : '';
-            break;
-          case AUTH_TYPES.OAUTH:
-            config.clientId = items[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '';
-            config.clientSecret = items[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '';
-            // Note: OAuth認証は現在未実装。将来的にアクセストークン取得フローを追加予定
-            config.accessToken = '';
-            break;
-          case AUTH_TYPES.SESSION:
-            // セッション認証（Cookieを使用）は特別な設定不要
-            break;
-        }
-        
-        resolve(config);
-      });
-    });
+    const items = await chrome.storage.session.get([
+      STORAGE_KEYS.AUTH_TYPE,
+      STORAGE_KEYS.AUTH_USER,
+      STORAGE_KEYS.AUTH_PASS,
+      STORAGE_KEYS.AUTH_API_TOKEN,
+      STORAGE_KEYS.OAUTH_CLIENT_ID,
+      STORAGE_KEYS.OAUTH_CLIENT_SECRET
+    ]);
+
+    // デフォルトはセッション認証（kintoneのCookieを使用）
+    const authType = items[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION;
+    const config = { authType };
+
+    switch (authType) {
+      case AUTH_TYPES.PASSWORD:
+        config.username = items[STORAGE_KEYS.AUTH_USER] ? await decrypt(items[STORAGE_KEYS.AUTH_USER]) : '';
+        config.password = items[STORAGE_KEYS.AUTH_PASS] ? await decrypt(items[STORAGE_KEYS.AUTH_PASS]) : '';
+        break;
+      case AUTH_TYPES.TOKEN:
+        config.apiToken = items[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(items[STORAGE_KEYS.AUTH_API_TOKEN]) : '';
+        break;
+      case AUTH_TYPES.OAUTH:
+        config.clientId = items[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '';
+        config.clientSecret = items[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '';
+        // Note: OAuth認証は現在未実装。将来的にアクセストークン取得フローを追加予定
+        config.accessToken = '';
+        break;
+      case AUTH_TYPES.SESSION:
+        // セッション認証（Cookieを使用）は特別な設定不要
+        break;
+    }
+
+    return config;
   }
 
   /**
@@ -88,16 +81,14 @@ export class ConfigManager {
     const encrypted = {
       [STORAGE_KEYS.AUTH_TYPE]: config.authType
     };
-    
+
     if (config.authUser) encrypted[STORAGE_KEYS.AUTH_USER] = await encrypt(config.authUser);
     if (config.authPass) encrypted[STORAGE_KEYS.AUTH_PASS] = await encrypt(config.authPass);
     if (config.authApiToken) encrypted[STORAGE_KEYS.AUTH_API_TOKEN] = await encrypt(config.authApiToken);
     if (config.oauthClientId) encrypted[STORAGE_KEYS.OAUTH_CLIENT_ID] = await encrypt(config.oauthClientId);
     if (config.oauthClientSecret) encrypted[STORAGE_KEYS.OAUTH_CLIENT_SECRET] = await encrypt(config.oauthClientSecret);
-    
-    return new Promise((resolve) => {
-      chrome.storage.session.set(encrypted, resolve);
-    });
+
+    await chrome.storage.session.set(encrypted);
   }
 
   /**
@@ -105,9 +96,8 @@ export class ConfigManager {
    * @returns {Promise<Object>} 全設定オブジェクト
    */
   static async loadAllConfig() {
-    // 認証情報はsessionストレージから、その他はlocalストレージから取得
-    return new Promise(async (resolve) => {
-      // 認証情報をsessionストレージから取得
+    // 認証情報はsessionストレージから、その他はlocalストレージから並行取得
+    const [authItems, otherItems] = await Promise.all([
       chrome.storage.session.get([
         STORAGE_KEYS.AUTH_TYPE,
         STORAGE_KEYS.AUTH_USER,
@@ -115,47 +105,45 @@ export class ConfigManager {
         STORAGE_KEYS.AUTH_API_TOKEN,
         STORAGE_KEYS.OAUTH_CLIENT_ID,
         STORAGE_KEYS.OAUTH_CLIENT_SECRET
-      ], async (authItems) => {
-        // その他の設定をlocalストレージから取得
-        chrome.storage.local.get([
-          STORAGE_KEYS.HISTORY_LIMIT,
-          STORAGE_KEYS.SHOW_REQUEST_HEADERS,
-          STORAGE_KEYS.SHOW_STATUS_CODE,
-          STORAGE_KEYS.SHOW_RESPONSE_HEADERS,
-          STORAGE_KEYS.SHOW_COPY_BUTTON,
-          STORAGE_KEYS.SHOW_RERUN_BUTTON,
-          STORAGE_KEYS.SHOW_DELETE_BUTTON,
-          STORAGE_KEYS.SHOW_EXECUTION_LOG,
-          STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
-          STORAGE_KEYS.COPY_INCLUDE_API_NAME,
-          STORAGE_KEYS.COPY_INCLUDE_URL
-        ], async (otherItems) => {
-          resolve({
-            // デフォルトはセッション認証（kintoneのCookieを使用）
-            authType: authItems[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION,
-            authUser: authItems[STORAGE_KEYS.AUTH_USER] ? await decrypt(authItems[STORAGE_KEYS.AUTH_USER]) : '',
-            authPass: authItems[STORAGE_KEYS.AUTH_PASS] ? await decrypt(authItems[STORAGE_KEYS.AUTH_PASS]) : '',
-            authApiToken: authItems[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(authItems[STORAGE_KEYS.AUTH_API_TOKEN]) : '',
-            oauthClientId: authItems[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '',
-            oauthClientSecret: authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '',
-            historyLimit: Math.min(
-              Math.max(HISTORY_CONFIG.MIN_LIMIT, otherItems[STORAGE_KEYS.HISTORY_LIMIT] || HISTORY_CONFIG.DEFAULT_LIMIT),
-              HISTORY_CONFIG.MAX_LIMIT
-            ),
-            showRequestHeaders: otherItems[STORAGE_KEYS.SHOW_REQUEST_HEADERS] !== undefined ? otherItems[STORAGE_KEYS.SHOW_REQUEST_HEADERS] : true,
-            showStatusCode: otherItems[STORAGE_KEYS.SHOW_STATUS_CODE] !== undefined ? otherItems[STORAGE_KEYS.SHOW_STATUS_CODE] : true,
-            showResponseHeaders: otherItems[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] !== undefined ? otherItems[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] : true,
-            showCopyButton: otherItems[STORAGE_KEYS.SHOW_COPY_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_COPY_BUTTON] : true,
-            showRerunButton: otherItems[STORAGE_KEYS.SHOW_RERUN_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_RERUN_BUTTON] : true,
-            showDeleteButton: otherItems[STORAGE_KEYS.SHOW_DELETE_BUTTON] !== undefined ? otherItems[STORAGE_KEYS.SHOW_DELETE_BUTTON] : true,
-            showExecutionLog: otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] !== undefined ? otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] : false,
-            copyIncludeDisplayName: otherItems[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] : true,
-            copyIncludeApiName: otherItems[STORAGE_KEYS.COPY_INCLUDE_API_NAME] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_API_NAME] : true,
-            copyIncludeUrl: otherItems[STORAGE_KEYS.COPY_INCLUDE_URL] !== undefined ? otherItems[STORAGE_KEYS.COPY_INCLUDE_URL] : true
-          });
-        });
-      });
-    });
+      ]),
+      chrome.storage.local.get([
+        STORAGE_KEYS.HISTORY_LIMIT,
+        STORAGE_KEYS.SHOW_REQUEST_HEADERS,
+        STORAGE_KEYS.SHOW_STATUS_CODE,
+        STORAGE_KEYS.SHOW_RESPONSE_HEADERS,
+        STORAGE_KEYS.SHOW_COPY_BUTTON,
+        STORAGE_KEYS.SHOW_RERUN_BUTTON,
+        STORAGE_KEYS.SHOW_DELETE_BUTTON,
+        STORAGE_KEYS.SHOW_EXECUTION_LOG,
+        STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
+        STORAGE_KEYS.COPY_INCLUDE_API_NAME,
+        STORAGE_KEYS.COPY_INCLUDE_URL
+      ])
+    ]);
+
+    return {
+      // デフォルトはセッション認証（kintoneのCookieを使用）
+      authType: authItems[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION,
+      authUser: authItems[STORAGE_KEYS.AUTH_USER] ? await decrypt(authItems[STORAGE_KEYS.AUTH_USER]) : '',
+      authPass: authItems[STORAGE_KEYS.AUTH_PASS] ? await decrypt(authItems[STORAGE_KEYS.AUTH_PASS]) : '',
+      authApiToken: authItems[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(authItems[STORAGE_KEYS.AUTH_API_TOKEN]) : '',
+      oauthClientId: authItems[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '',
+      oauthClientSecret: authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '',
+      historyLimit: Math.min(
+        Math.max(HISTORY_CONFIG.MIN_LIMIT, otherItems[STORAGE_KEYS.HISTORY_LIMIT] ?? HISTORY_CONFIG.DEFAULT_LIMIT),
+        HISTORY_CONFIG.MAX_LIMIT
+      ),
+      showRequestHeaders: otherItems[STORAGE_KEYS.SHOW_REQUEST_HEADERS] ?? true,
+      showStatusCode: otherItems[STORAGE_KEYS.SHOW_STATUS_CODE] ?? true,
+      showResponseHeaders: otherItems[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] ?? true,
+      showCopyButton: otherItems[STORAGE_KEYS.SHOW_COPY_BUTTON] ?? true,
+      showRerunButton: otherItems[STORAGE_KEYS.SHOW_RERUN_BUTTON] ?? true,
+      showDeleteButton: otherItems[STORAGE_KEYS.SHOW_DELETE_BUTTON] ?? true,
+      showExecutionLog: otherItems[STORAGE_KEYS.SHOW_EXECUTION_LOG] ?? false,
+      copyIncludeDisplayName: otherItems[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] ?? true,
+      copyIncludeApiName: otherItems[STORAGE_KEYS.COPY_INCLUDE_API_NAME] ?? true,
+      copyIncludeUrl: otherItems[STORAGE_KEYS.COPY_INCLUDE_URL] ?? true
+    };
   }
 
   /**
@@ -163,19 +151,16 @@ export class ConfigManager {
    * @returns {Promise<Object>} コピー形式設定オブジェクト
    */
   static async getCopyFormatConfig() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([
-        STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
-        STORAGE_KEYS.COPY_INCLUDE_API_NAME,
-        STORAGE_KEYS.COPY_INCLUDE_URL
-      ], (items) => {
-        resolve({
-          copyIncludeDisplayName: items[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] : true,
-          copyIncludeApiName: items[STORAGE_KEYS.COPY_INCLUDE_API_NAME] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_API_NAME] : true,
-          copyIncludeUrl: items[STORAGE_KEYS.COPY_INCLUDE_URL] !== undefined ? items[STORAGE_KEYS.COPY_INCLUDE_URL] : true
-        });
-      });
-    });
+    const items = await chrome.storage.local.get([
+      STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
+      STORAGE_KEYS.COPY_INCLUDE_API_NAME,
+      STORAGE_KEYS.COPY_INCLUDE_URL
+    ]);
+    return {
+      copyIncludeDisplayName: items[STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME] ?? true,
+      copyIncludeApiName: items[STORAGE_KEYS.COPY_INCLUDE_API_NAME] ?? true,
+      copyIncludeUrl: items[STORAGE_KEYS.COPY_INCLUDE_URL] ?? true
+    };
   }
 
   /**
@@ -184,12 +169,10 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async saveCopyFormatConfig(config) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({
-        [STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME]: config.copyIncludeDisplayName,
-        [STORAGE_KEYS.COPY_INCLUDE_API_NAME]: config.copyIncludeApiName,
-        [STORAGE_KEYS.COPY_INCLUDE_URL]: config.copyIncludeUrl
-      }, resolve);
+    await chrome.storage.local.set({
+      [STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME]: config.copyIncludeDisplayName,
+      [STORAGE_KEYS.COPY_INCLUDE_API_NAME]: config.copyIncludeApiName,
+      [STORAGE_KEYS.COPY_INCLUDE_URL]: config.copyIncludeUrl
     });
   }
 
@@ -198,19 +181,16 @@ export class ConfigManager {
    * @returns {Promise<Object>} 表示設定オブジェクト
    */
   static async getRestApiDisplayConfig() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([
-        STORAGE_KEYS.SHOW_REQUEST_HEADERS,
-        STORAGE_KEYS.SHOW_STATUS_CODE,
-        STORAGE_KEYS.SHOW_RESPONSE_HEADERS
-      ], (items) => {
-        resolve({
-          showRequestHeaders: items[STORAGE_KEYS.SHOW_REQUEST_HEADERS] !== undefined ? items[STORAGE_KEYS.SHOW_REQUEST_HEADERS] : true,
-          showStatusCode: items[STORAGE_KEYS.SHOW_STATUS_CODE] !== undefined ? items[STORAGE_KEYS.SHOW_STATUS_CODE] : true,
-          showResponseHeaders: items[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] !== undefined ? items[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] : true
-        });
-      });
-    });
+    const items = await chrome.storage.local.get([
+      STORAGE_KEYS.SHOW_REQUEST_HEADERS,
+      STORAGE_KEYS.SHOW_STATUS_CODE,
+      STORAGE_KEYS.SHOW_RESPONSE_HEADERS
+    ]);
+    return {
+      showRequestHeaders: items[STORAGE_KEYS.SHOW_REQUEST_HEADERS] ?? true,
+      showStatusCode: items[STORAGE_KEYS.SHOW_STATUS_CODE] ?? true,
+      showResponseHeaders: items[STORAGE_KEYS.SHOW_RESPONSE_HEADERS] ?? true
+    };
   }
 
   /**
@@ -219,12 +199,10 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async saveRestApiDisplayConfig(config) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({
-        [STORAGE_KEYS.SHOW_REQUEST_HEADERS]: config.showRequestHeaders,
-        [STORAGE_KEYS.SHOW_STATUS_CODE]: config.showStatusCode,
-        [STORAGE_KEYS.SHOW_RESPONSE_HEADERS]: config.showResponseHeaders
-      }, resolve);
+    await chrome.storage.local.set({
+      [STORAGE_KEYS.SHOW_REQUEST_HEADERS]: config.showRequestHeaders,
+      [STORAGE_KEYS.SHOW_STATUS_CODE]: config.showStatusCode,
+      [STORAGE_KEYS.SHOW_RESPONSE_HEADERS]: config.showResponseHeaders
     });
   }
 
@@ -233,19 +211,16 @@ export class ConfigManager {
    * @returns {Promise<Object>} ボタン表示設定オブジェクト
    */
   static async getButtonDisplayConfig() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([
-        STORAGE_KEYS.SHOW_COPY_BUTTON,
-        STORAGE_KEYS.SHOW_RERUN_BUTTON,
-        STORAGE_KEYS.SHOW_DELETE_BUTTON
-      ], (items) => {
-        resolve({
-          showCopyButton: items[STORAGE_KEYS.SHOW_COPY_BUTTON] !== undefined ? items[STORAGE_KEYS.SHOW_COPY_BUTTON] : true,
-          showRerunButton: items[STORAGE_KEYS.SHOW_RERUN_BUTTON] !== undefined ? items[STORAGE_KEYS.SHOW_RERUN_BUTTON] : true,
-          showDeleteButton: items[STORAGE_KEYS.SHOW_DELETE_BUTTON] !== undefined ? items[STORAGE_KEYS.SHOW_DELETE_BUTTON] : true
-        });
-      });
-    });
+    const items = await chrome.storage.local.get([
+      STORAGE_KEYS.SHOW_COPY_BUTTON,
+      STORAGE_KEYS.SHOW_RERUN_BUTTON,
+      STORAGE_KEYS.SHOW_DELETE_BUTTON
+    ]);
+    return {
+      showCopyButton: items[STORAGE_KEYS.SHOW_COPY_BUTTON] ?? true,
+      showRerunButton: items[STORAGE_KEYS.SHOW_RERUN_BUTTON] ?? true,
+      showDeleteButton: items[STORAGE_KEYS.SHOW_DELETE_BUTTON] ?? true
+    };
   }
 
   /**
@@ -254,12 +229,10 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async saveButtonDisplayConfig(config) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({
-        [STORAGE_KEYS.SHOW_COPY_BUTTON]: config.showCopyButton,
-        [STORAGE_KEYS.SHOW_RERUN_BUTTON]: config.showRerunButton,
-        [STORAGE_KEYS.SHOW_DELETE_BUTTON]: config.showDeleteButton
-      }, resolve);
+    await chrome.storage.local.set({
+      [STORAGE_KEYS.SHOW_COPY_BUTTON]: config.showCopyButton,
+      [STORAGE_KEYS.SHOW_RERUN_BUTTON]: config.showRerunButton,
+      [STORAGE_KEYS.SHOW_DELETE_BUTTON]: config.showDeleteButton
     });
   }
 
@@ -268,11 +241,8 @@ export class ConfigManager {
    * @returns {Promise<boolean>} 実行ログ表示設定（デフォルト: false）
    */
   static async getExecutionLogEnabled() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.SHOW_EXECUTION_LOG], (items) => {
-        resolve(items[STORAGE_KEYS.SHOW_EXECUTION_LOG] !== undefined ? items[STORAGE_KEYS.SHOW_EXECUTION_LOG] : false);
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.SHOW_EXECUTION_LOG]);
+    return items[STORAGE_KEYS.SHOW_EXECUTION_LOG] ?? false;
   }
 
   /**
@@ -281,11 +251,7 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async saveExecutionLogEnabled(enabled) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({
-        [STORAGE_KEYS.SHOW_EXECUTION_LOG]: enabled
-      }, resolve);
-    });
+    await chrome.storage.local.set({ [STORAGE_KEYS.SHOW_EXECUTION_LOG]: enabled });
   }
 
   /**
@@ -293,16 +259,14 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async clearAuthCredentials() {
-    return new Promise((resolve) => {
-      chrome.storage.session.remove([
-        STORAGE_KEYS.AUTH_TYPE,
-        STORAGE_KEYS.AUTH_USER,
-        STORAGE_KEYS.AUTH_PASS,
-        STORAGE_KEYS.AUTH_API_TOKEN,
-        STORAGE_KEYS.OAUTH_CLIENT_ID,
-        STORAGE_KEYS.OAUTH_CLIENT_SECRET
-      ], resolve);
-    });
+    await chrome.storage.session.remove([
+      STORAGE_KEYS.AUTH_TYPE,
+      STORAGE_KEYS.AUTH_USER,
+      STORAGE_KEYS.AUTH_PASS,
+      STORAGE_KEYS.AUTH_API_TOKEN,
+      STORAGE_KEYS.OAUTH_CLIENT_ID,
+      STORAGE_KEYS.OAUTH_CLIENT_SECRET
+    ]);
   }
 
   /**
@@ -318,12 +282,8 @@ export class ConfigManager {
    * @returns {Promise<number|null>} タブID（保存されていない場合はnull）
    */
   static async getKintoneTabId() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.KINTONE_TAB_ID], (items) => {
-        const tabId = items[STORAGE_KEYS.KINTONE_TAB_ID];
-        resolve(tabId !== undefined ? tabId : null);
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.KINTONE_TAB_ID]);
+    return items[STORAGE_KEYS.KINTONE_TAB_ID] ?? null;
   }
 
   /**
@@ -331,12 +291,8 @@ export class ConfigManager {
    * @returns {Promise<Object|null>} タブ情報（{ title: string, url: string }）保存されていない場合はnull
    */
   static async getKintoneTabInfo() {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.KINTONE_TAB_INFO], (items) => {
-        const tabInfo = items[STORAGE_KEYS.KINTONE_TAB_INFO];
-        resolve(tabInfo !== undefined ? tabInfo : null);
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.KINTONE_TAB_INFO]);
+    return items[STORAGE_KEYS.KINTONE_TAB_INFO] ?? null;
   }
 
   /**
@@ -346,11 +302,9 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async saveKintoneTab(tabId, tabInfo) {
-    return new Promise((resolve) => {
-      chrome.storage.local.set({
-        [STORAGE_KEYS.KINTONE_TAB_ID]: tabId,
-        [STORAGE_KEYS.KINTONE_TAB_INFO]: tabInfo
-      }, resolve);
+    await chrome.storage.local.set({
+      [STORAGE_KEYS.KINTONE_TAB_ID]: tabId,
+      [STORAGE_KEYS.KINTONE_TAB_INFO]: tabInfo
     });
   }
 
@@ -359,12 +313,10 @@ export class ConfigManager {
    * @returns {Promise<void>}
    */
   static async clearKintoneTab() {
-    return new Promise((resolve) => {
-      chrome.storage.local.remove([
-        STORAGE_KEYS.KINTONE_TAB_ID,
-        STORAGE_KEYS.KINTONE_TAB_INFO
-      ], resolve);
-    });
+    await chrome.storage.local.remove([
+      STORAGE_KEYS.KINTONE_TAB_ID,
+      STORAGE_KEYS.KINTONE_TAB_INFO
+    ]);
   }
 
   /**

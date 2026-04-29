@@ -49,15 +49,8 @@ chrome.idle.onStateChanged.addListener(async (newState) => {
  * @returns {Promise<Object|null>} 認証設定オブジェクト
  */
 async function getAuthConfigFromSession() {
-  return new Promise((resolve) => {
-    chrome.storage.session.get([STORAGE_KEYS.AUTH_TYPE], (items) => {
-      if (items[STORAGE_KEYS.AUTH_TYPE]) {
-        resolve({ authType: items[STORAGE_KEYS.AUTH_TYPE] });
-      } else {
-        resolve(null);
-      }
-    });
-  });
+  const items = await chrome.storage.session.get([STORAGE_KEYS.AUTH_TYPE]);
+  return items[STORAGE_KEYS.AUTH_TYPE] ? { authType: items[STORAGE_KEYS.AUTH_TYPE] } : null;
 }
 
 /**
@@ -65,16 +58,14 @@ async function getAuthConfigFromSession() {
  * @returns {Promise<void>}
  */
 async function clearAuthCredentials() {
-  return new Promise((resolve) => {
-    chrome.storage.session.remove([
-      STORAGE_KEYS.AUTH_TYPE,
-      STORAGE_KEYS.AUTH_USER,
-      STORAGE_KEYS.AUTH_PASS,
-      STORAGE_KEYS.AUTH_API_TOKEN,
-      STORAGE_KEYS.OAUTH_CLIENT_ID,
-      STORAGE_KEYS.OAUTH_CLIENT_SECRET
-    ], resolve);
-  });
+  await chrome.storage.session.remove([
+    STORAGE_KEYS.AUTH_TYPE,
+    STORAGE_KEYS.AUTH_USER,
+    STORAGE_KEYS.AUTH_PASS,
+    STORAGE_KEYS.AUTH_API_TOKEN,
+    STORAGE_KEYS.OAUTH_CLIENT_ID,
+    STORAGE_KEYS.OAUTH_CLIENT_SECRET
+  ]);
 }
 
 // ===== ログ出力ヘルパー =====
@@ -84,11 +75,8 @@ async function clearAuthCredentials() {
  * @returns {Promise<boolean>}
  */
 async function getExecutionLogEnabled() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEYS.SHOW_EXECUTION_LOG], (items) => {
-      resolve(items[STORAGE_KEYS.SHOW_EXECUTION_LOG] !== undefined ? items[STORAGE_KEYS.SHOW_EXECUTION_LOG] : false);
-    });
-  });
+  const items = await chrome.storage.local.get([STORAGE_KEYS.SHOW_EXECUTION_LOG]);
+  return items[STORAGE_KEYS.SHOW_EXECUTION_LOG] ?? false;
 }
 
 /**

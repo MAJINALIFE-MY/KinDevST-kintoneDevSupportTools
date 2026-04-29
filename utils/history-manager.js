@@ -28,7 +28,7 @@ export class HistoryManager {
   static async save(type, apiName, args, result, error = null, requestHeaders = null, statusCode = null, statusText = null, responseHeaders = null) {
     const limit = await ConfigManager.getHistoryLimit();
     const { displayTime, timestamp } = formatCurrentDateTime();
-    
+
     const historyItem = {
       type,
       apiName,
@@ -36,26 +36,22 @@ export class HistoryManager {
       result: error ? null : JSON.stringify(result),
       error: error ? error.message : null,
       requestHeaders: requestHeaders ? JSON.stringify(requestHeaders) : null,
-      statusCode: statusCode !== null && statusCode !== undefined ? statusCode : null,
+      statusCode: statusCode != null ? statusCode : null,
       statusText: statusText || null,
       responseHeaders: responseHeaders ? JSON.stringify(responseHeaders) : null,
       timestamp,
       displayTime
     };
-    
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.HISTORY], (items) => {
-        let history = items[STORAGE_KEYS.HISTORY] || [];
-        history.unshift(historyItem); // 先頭に追加
-        
-        // 上限を超えた分を削除
-        if (history.length > limit) {
-          history = history.slice(0, limit);
-        }
-        
-        chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history }, resolve);
-      });
-    });
+
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY]);
+    let history = items[STORAGE_KEYS.HISTORY] || [];
+    history.unshift(historyItem);
+
+    if (history.length > limit) {
+      history = history.slice(0, limit);
+    }
+
+    await chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history });
   }
 
   /**
@@ -64,12 +60,9 @@ export class HistoryManager {
    * @returns {Promise<Array>} 履歴アイテムの配列
    */
   static async getByType(type) {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.HISTORY], (items) => {
-        const history = items[STORAGE_KEYS.HISTORY] || [];
-        resolve(history.filter(item => item.type === type));
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY]);
+    const history = items[STORAGE_KEYS.HISTORY] || [];
+    return history.filter(item => item.type === type);
   }
 
   /**
@@ -78,13 +71,9 @@ export class HistoryManager {
    * @returns {Promise<void>}
    */
   static async deleteByTimestamp(timestamp) {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.HISTORY], (items) => {
-        let history = items[STORAGE_KEYS.HISTORY] || [];
-        history = history.filter(h => h.timestamp !== timestamp);
-        chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history }, resolve);
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY]);
+    const history = (items[STORAGE_KEYS.HISTORY] || []).filter(h => h.timestamp !== timestamp);
+    await chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history });
   }
 
   /**
@@ -93,17 +82,11 @@ export class HistoryManager {
    */
   static async trimToLimit() {
     const limit = await ConfigManager.getHistoryLimit();
-    return new Promise((resolve) => {
-      chrome.storage.local.get([STORAGE_KEYS.HISTORY], (items) => {
-        let history = items[STORAGE_KEYS.HISTORY] || [];
-        if (history.length > limit) {
-          history = history.slice(0, limit);
-          chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history }, resolve);
-        } else {
-          resolve();
-        }
-      });
-    });
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY]);
+    const history = items[STORAGE_KEYS.HISTORY] || [];
+    if (history.length > limit) {
+      await chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history.slice(0, limit) });
+    }
   }
 
   // ハンドラーを保存（削除後の再表示で使用）

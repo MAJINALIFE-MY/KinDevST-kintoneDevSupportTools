@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 6 44 44" width="100%" height="100%">
+  <!-- クラウド/kintoneを模した雲 -->
+  <path d="M 12 32
+           C 7.58 32 4 28.42 4 24
+           C 4 19.86 7.14 16.45 11.18 16.08
+           C 12.54 11.48 16.84 8 22 8
+           C 27.16 8 31.46 11.48 32.82 16.08
+           C 36.86 16.45 40 19.86 40 24
+           C 40 28.42 36.42 32 32 32
+          Z" fill="#0845FF" />
+
+  <!-- API操作パネルの白フチ（重なり部分の切り抜き表現） -->
+  <rect x="18" y="18" width="30" height="30" rx="8" fill="#FFFFFF" />
+
+  <!-- API操作パネル (各種APIを通じたCRUD操作を表現) -->
+  <g transform="translate(20, 20)">
+    <rect x="0" y="0" width="26" height="26" rx="6" fill="#F7BA00" />
+    
+    <!-- 左上: GET (下向き矢印) -->
+    <path d="M 7 5 L 7 11 M 4 8 L 7 11 L 10 8" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- 右上: POST (上向き矢印) -->
+    <path d="M 19 11 L 19 5 M 16 8 L 19 5 L 22 8" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- 左下: PUSH/PUT (プラス記号) -->
+    <path d="M 7 16 L 7 22 M 4 19 L 10 19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    
+    <!-- 右下: DELETE (バツ記号) -->
+    <path d="M 16.5 16.5 L 21.5 21.5 M 21.5 16.5 L 16.5 21.5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>
