@@ -39,7 +39,8 @@ export const HISTORY_CONFIG = {
 // API種別
 export const API_TYPES = {
   REST: 'rest',
-  JS: 'js'
+  JS: 'js',
+  USER: 'user'
 };
 
 // 認証方式
@@ -79,6 +80,18 @@ export const JS_DOM_IDS = {
   ARGS_CONTAINER: 'js-args-container',
   EXEC_BTN: 'js-exec-btn',
   HISTORY_LIST: 'js-history-list'
+};
+
+// DOM要素ID（User API用）
+export const USER_DOM_IDS = {
+  SELECTOR_DISPLAY: 'user-api-selector-display',
+  SELECTOR_NAME: 'user-api-selector-name',
+  DOC_LINK: 'user-api-doc-link',
+  COPY_NAME_BTN: 'user-api-copy-name-btn',
+  INFO_DISPLAY: 'user-api-info-display',
+  BODY: 'user-body',
+  EXEC_BTN: 'user-exec-btn',
+  HISTORY_LIST: 'user-history-list'
 };
 
 // DOM要素ID（設定画面用）

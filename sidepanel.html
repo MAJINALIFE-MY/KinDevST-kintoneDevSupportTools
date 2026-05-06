@@ -13,6 +13,7 @@
     <!-- タブメニュー -->
     <div class="tabs">
       <button class="tab-button active" data-tab="rest">REST API</button>
+      <button class="tab-button" data-tab="user">User API</button>
       <button class="tab-button" data-tab="js">JS API</button>
       <button class="tab-button" data-tab="config">Setting</button>
     </div>
@@ -56,6 +57,50 @@
       <!-- 履歴表示エリア -->
       <div id="rest-history-container" class="history-container">
         <div id="rest-history-list">
+          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- User API タブ -->
+    <div id="user" class="tab-content">
+      <div class="form-group">
+        <label>表示名</label>
+        <select id="user-api-selector-display">
+        </select>
+      </div>
+      <div class="form-group">
+        <label>API</label>
+        <select id="user-api-selector-name">
+        </select>
+        <div id="user-api-doc-link" class="doc-link">
+          <a href="#" target="_blank">📖 ドキュメントを開く</a>
+          <button type="button" id="user-api-copy-name-btn" class="api-copy-name-btn">API名をコピー</button>
+        </div>
+      </div>
+
+      <!-- API選択時の情報表示 -->
+      <div id="user-api-info-display" class="api-info-display hidden">
+        <div class="api-info-row">
+          <span class="api-info-label">Method:</span>
+          <span class="api-method"></span>
+        </div>
+        <div class="api-info-row">
+          <span class="api-info-label">Endpoint:</span>
+          <span class="api-endpoint"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Body(JSON) / Query Parameters</label>
+        <textarea id="user-body" placeholder=""></textarea>
+        <small class="help-text">※GET/DELETEの場合はクエリパラメータ、POST/PUTの場合はボディとして使用</small>
+      </div>
+      <button id="user-exec-btn" class="primary-btn">実行(User API)</button>
+
+      <!-- 履歴表示エリア -->
+      <div id="user-history-container" class="history-container">
+        <div id="user-history-list">
           <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
         </div>
       </div>

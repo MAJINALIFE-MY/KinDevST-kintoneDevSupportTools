@@ -210,15 +210,15 @@ export class HistoryManager {
       showStatusCode: true,
       showResponseHeaders: true
     };
-    if (type === API_TYPES.REST) {
+    if (type === API_TYPES.REST || type === API_TYPES.USER) {
       displayConfig = await ConfigManager.getRestApiDisplayConfig();
     }
-    
+
     // 最初のlabelかどうかを追跡するフラグ
     let isFirstLabel = true;
-    
-    // REST APIの場合、リクエストボディを表示
-    if (type === API_TYPES.REST && item.args) {
+
+    // REST/User APIの場合、リクエストボディを表示
+    if ((type === API_TYPES.REST || type === API_TYPES.USER) && item.args) {
       try {
         const args = JSON.parse(item.args);
         if (args && args.length > 0 && args[0] && Object.keys(args[0]).length > 0) {
@@ -233,8 +233,8 @@ export class HistoryManager {
       }
     }
     
-    // REST APIの場合、ヘッダー情報を表示（設定に基づいて表示/非表示を制御）
-    if (type === API_TYPES.REST && (item.requestHeaders || item.statusCode !== null || item.responseHeaders)) {
+    // REST/User APIの場合、ヘッダー情報を表示（設定に基づいて表示/非表示を制御）
+    if ((type === API_TYPES.REST || type === API_TYPES.USER) && (item.requestHeaders || item.statusCode !== null || item.responseHeaders)) {
       // Request Headers
       if (item.requestHeaders && displayConfig.showRequestHeaders) {
         historyItem.appendChild(this._createLabel('Request Headers:', isFirstLabel));
@@ -353,7 +353,14 @@ export class HistoryManager {
   static _createRerunButton(item, type, historyListId, handlers) {
     if (!handlers) return null;
     
-    const handler = type === API_TYPES.REST ? handlers.rest : handlers.js;
+    let handler;
+    if (type === API_TYPES.REST) {
+      handler = handlers.rest;
+    } else if (type === API_TYPES.USER) {
+      handler = handlers.user;
+    } else {
+      handler = handlers.js;
+    }
     if (!handler) return null;
     
     const rerunBtn = document.createElement('button');
@@ -419,8 +426,8 @@ export class HistoryManager {
     const apiDisplayText = this._formatApiDisplayText(item);
     lines.push(apiDisplayText);
     
-    if (type === API_TYPES.REST) {
-      // REST API固有の情報を追加
+    if (type === API_TYPES.REST || type === API_TYPES.USER) {
+      // REST/User API固有の情報を追加
       const displayConfig = await ConfigManager.getRestApiDisplayConfig();
       
       // Request Body

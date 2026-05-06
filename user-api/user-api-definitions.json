@@ -1,0 +1,352 @@
+[
+  {
+    "category": "cybozu.com共通管理 - ユーザーAPI",
+    "apis": [
+      {
+        "name": "GET /v1/users.json",
+        "displayName": "ユーザーを取得する",
+        "method": "GET",
+        "endpoint": "/v1/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/f31ce2157b6070e0173ec477/",
+        "bodyPlaceholder": "{\"codes\":[\"sato-noboru\"],\"size\":100,\"offset\":0}"
+      },
+      {
+        "name": "POST /v1/users.json",
+        "displayName": "ユーザーを追加する",
+        "method": "POST",
+        "endpoint": "/v1/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/d2ddb7e174fc79659368142f/",
+        "bodyPlaceholder": "{\"users\":[{\"code\":\"user001\",\"password\":\"password123\",\"name\":\"山田 太郎\",\"surName\":\"山田\",\"givenName\":\"太郎\",\"locale\":\"ja\",\"timezone\":\"Asia/Tokyo\",\"email\":\"user001@example.com\"}]}"
+      },
+      {
+        "name": "PUT /v1/users.json",
+        "displayName": "ユーザーを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/03fd7b932c456b512212c489/",
+        "bodyPlaceholder": "{\"users\":[{\"code\":\"user001\",\"name\":\"山田 太郎\",\"email\":\"user001@example.com\",\"valid\":true}]}"
+      },
+      {
+        "name": "DELETE /v1/users.json",
+        "displayName": "ユーザーを削除する",
+        "method": "DELETE",
+        "endpoint": "/v1/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/ada0c0faade020ccd0451e19/",
+        "bodyPlaceholder": "{\"codes\":[\"user001\"]}"
+      },
+      {
+        "name": "PUT /v1/users/codes.json",
+        "displayName": "ユーザーのログイン名を更新する",
+        "method": "PUT",
+        "endpoint": "/v1/users/codes.json",
+        "docUrl": "https://cybozu.dev/ja/id/6087b45b46f53a059e40e3f9/",
+        "bodyPlaceholder": "{\"codes\":[{\"currentCode\":\"user001\",\"newCode\":\"user001-new\"}]}"
+      },
+      {
+        "name": "GET /v1/user/organizations.json",
+        "displayName": "ユーザーが所属する組織を取得する",
+        "method": "GET",
+        "endpoint": "/v1/user/organizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/f6f12fac2fb16fca3b1a107c/",
+        "bodyPlaceholder": "{\"code\":\"user001\"}"
+      },
+      {
+        "name": "PUT /v1/userOrganizations.json",
+        "displayName": "ユーザーが所属する組織を更新する",
+        "method": "PUT",
+        "endpoint": "/v1/userOrganizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/89ee153b6f841dd5ec851dff/",
+        "bodyPlaceholder": "{\"userOrganizations\":[{\"user\":\"user001\",\"organization\":\"org001\",\"title\":\"manager\"}]}"
+      },
+      {
+        "name": "GET /v1/user/groups.json",
+        "displayName": "ユーザーが所属するグループ（ロール）を取得する",
+        "method": "GET",
+        "endpoint": "/v1/user/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/c68dcd7d35c2590eb64e2140/",
+        "bodyPlaceholder": "{\"code\":\"user001\"}"
+      },
+      {
+        "name": "PUT /v1/user/groups.json",
+        "displayName": "ユーザーが所属するグループ（ロール）を更新する",
+        "method": "PUT",
+        "endpoint": "/v1/user/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/30d8c2f7ed7d0b408be3feac/",
+        "bodyPlaceholder": "{\"userGroups\":[{\"user\":\"user001\",\"groups\":[\"Administrators\"]}]}"
+      },
+      {
+        "name": "GET /v1/users/services.json",
+        "displayName": "ユーザーの利用サービスを取得する",
+        "method": "GET",
+        "endpoint": "/v1/users/services.json",
+        "docUrl": "https://cybozu.dev/ja/id/8470991efa7bd995c935d3ef/",
+        "bodyPlaceholder": "{\"codes\":[\"user001\"]}"
+      },
+      {
+        "name": "PUT /v1/users/services.json",
+        "displayName": "ユーザーの利用サービスを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/users/services.json",
+        "docUrl": "https://cybozu.dev/ja/id/cc95a4e88c8f7e48bad8c86c/",
+        "bodyPlaceholder": "{\"users\":[{\"code\":\"user001\",\"services\":[\"kintone\",\"garoon\"]}]}"
+      }
+    ]
+  },
+  {
+    "category": "cybozu.com共通管理 - 組織API",
+    "apis": [
+      {
+        "name": "GET /v1/organizations.json",
+        "displayName": "組織を取得する",
+        "method": "GET",
+        "endpoint": "/v1/organizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/2db19fac4d889216ebe8c2d7/",
+        "bodyPlaceholder": "{\"codes\":[\"org001\"],\"size\":100,\"offset\":0}"
+      },
+      {
+        "name": "POST /v1/organizations.json",
+        "displayName": "組織を追加する",
+        "method": "POST",
+        "endpoint": "/v1/organizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/6b8d51c9f6289c9e0d74bee7/",
+        "bodyPlaceholder": "{\"organizations\":[{\"code\":\"org001\",\"name\":\"営業部\",\"parentCode\":\"root\",\"sortOrder\":10}]}"
+      },
+      {
+        "name": "PUT /v1/organizations.json",
+        "displayName": "組織を更新する",
+        "method": "PUT",
+        "endpoint": "/v1/organizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/4f697f5c0c11d2f25ae868fd/",
+        "bodyPlaceholder": "{\"organizations\":[{\"code\":\"org001\",\"name\":\"営業本部\",\"parentCode\":\"root\",\"sortOrder\":5}]}"
+      },
+      {
+        "name": "DELETE /v1/organizations.json",
+        "displayName": "組織を削除する",
+        "method": "DELETE",
+        "endpoint": "/v1/organizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/8debe1d60568576b7b6de79d/",
+        "bodyPlaceholder": "{\"codes\":[\"org001\"]}"
+      },
+      {
+        "name": "PUT /v1/organizations/codes.json",
+        "displayName": "組織コードを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/organizations/codes.json",
+        "docUrl": "https://cybozu.dev/ja/id/0df13babe00b3483cb80661a/",
+        "bodyPlaceholder": "{\"codes\":[{\"currentCode\":\"org001\",\"newCode\":\"org001-new\"}]}"
+      },
+      {
+        "name": "GET /v1/organization/users.json",
+        "displayName": "組織の所属ユーザーを取得する",
+        "method": "GET",
+        "endpoint": "/v1/organization/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/dc5a48da9f4a2f30bbfdfbbf/",
+        "bodyPlaceholder": "{\"code\":\"org001\"}"
+      }
+    ]
+  },
+  {
+    "category": "cybozu.com共通管理 - グループAPI",
+    "apis": [
+      {
+        "name": "GET /v1/groups.json",
+        "displayName": "グループを取得する",
+        "method": "GET",
+        "endpoint": "/v1/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/abca5eb5e1b2e7e10f635c0d/",
+        "bodyPlaceholder": "{\"codes\":[\"group001\"],\"size\":100,\"offset\":0}"
+      },
+      {
+        "name": "POST /v1/groups.json",
+        "displayName": "グループを追加する",
+        "method": "POST",
+        "endpoint": "/v1/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/8ead933575dde19df20d446e/",
+        "bodyPlaceholder": "{\"groups\":[{\"code\":\"group001\",\"name\":\"管理者グループ\",\"sortOrder\":100}]}"
+      },
+      {
+        "name": "PUT /v1/groups.json",
+        "displayName": "グループを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/6e0503ab6502bd6bcdab08cc/",
+        "bodyPlaceholder": "{\"groups\":[{\"code\":\"group001\",\"name\":\"新グループ名\",\"sortOrder\":50}]}"
+      },
+      {
+        "name": "DELETE /v1/groups.json",
+        "displayName": "グループを削除する",
+        "method": "DELETE",
+        "endpoint": "/v1/groups.json",
+        "docUrl": "https://cybozu.dev/ja/id/310843ecbd0d35918663fa92/",
+        "bodyPlaceholder": "{\"codes\":[\"group001\"]}"
+      },
+      {
+        "name": "PUT /v1/groups/codes.json",
+        "displayName": "グループコードを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/groups/codes.json",
+        "docUrl": "https://cybozu.dev/ja/id/e289533c33916a49e7b078d0/",
+        "bodyPlaceholder": "{\"codes\":[{\"currentCode\":\"group001\",\"newCode\":\"group001-new\"}]}"
+      },
+      {
+        "name": "GET /v1/group/users.json",
+        "displayName": "グループの所属ユーザーを取得する",
+        "method": "GET",
+        "endpoint": "/v1/group/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/0ca6159e49cc77853997e565/",
+        "bodyPlaceholder": "{\"code\":\"group001\"}"
+      },
+      {
+        "name": "PUT /v1/group/users.json",
+        "displayName": "グループの所属ユーザーを更新する",
+        "method": "PUT",
+        "endpoint": "/v1/group/users.json",
+        "docUrl": "https://cybozu.dev/ja/id/4c99cd422f3008314eaa12e3/",
+        "bodyPlaceholder": "{\"groupUsers\":[{\"group\":\"group001\",\"users\":[\"user001\",\"user002\"]}]}"
+      }
+    ]
+  },
+  {
+    "category": "cybozu.com共通管理 - CSVインポート／エクスポート 共通",
+    "apis": [
+      {
+        "name": "POST /v1/file.json",
+        "displayName": "ファイルをアップロードする",
+        "method": "POST",
+        "endpoint": "/v1/file.json",
+        "docUrl": "https://cybozu.dev/ja/id/945a5f0763bf8ce3d9f362e9/",
+        "bodyPlaceholder": "{\"file\":\"<base64EncodedCsv>\"}"
+      },
+      {
+        "name": "GET /v1/csv/result.json",
+        "displayName": "インポートの結果を確認する",
+        "method": "GET",
+        "endpoint": "/v1/csv/result.json",
+        "docUrl": "https://cybozu.dev/ja/id/63cfd582e4054bf518e0b73e/",
+        "bodyPlaceholder": "{\"id\":\"importTaskId\"}"
+      }
+    ]
+  },
+  {
+    "category": "cybozu.com共通管理 - CSVインポート",
+    "apis": [
+      {
+        "name": "POST /v1/csv/user.json",
+        "displayName": "ユーザー情報をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/user.json",
+        "docUrl": "https://cybozu.dev/ja/id/467e83cfc99984452c4f4267/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/userOrganizations.json",
+        "displayName": "ユーザーが所属する組織をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/userOrganizations.json",
+        "docUrl": "https://cybozu.dev/ja/id/70b3e8bf2a1633dca95d50b1/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/userGroups.json",
+        "displayName": "ユーザーが所属するグループ（ロール）をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/userGroups.json",
+        "docUrl": "https://cybozu.dev/ja/id/638ed237fcf632b1eaaf27dc/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/userServices.json",
+        "displayName": "ユーザーの利用サービスをインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/userServices.json",
+        "docUrl": "https://cybozu.dev/ja/id/84bc4dfb3dba693ce1af8bec/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/organization.json",
+        "displayName": "組織情報をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/organization.json",
+        "docUrl": "https://cybozu.dev/ja/id/1dd95f1638fa51950060c87e/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/title.json",
+        "displayName": "役職情報をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/title.json",
+        "docUrl": "https://cybozu.dev/ja/id/44ce9262bf0308ba58fd8e02/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      },
+      {
+        "name": "POST /v1/csv/group.json",
+        "displayName": "グループ情報をインポートする",
+        "method": "POST",
+        "endpoint": "/v1/csv/group.json",
+        "docUrl": "https://cybozu.dev/ja/id/e34fa384da432d6e243383f3/",
+        "bodyPlaceholder": "{\"fileKey\":\"uploadFileKey\",\"hasHeader\":true}"
+      }
+    ]
+  },
+  {
+    "category": "cybozu.com共通管理 - CSVエクスポート",
+    "apis": [
+      {
+        "name": "GET /v1/csv/user.csv",
+        "displayName": "ユーザー情報をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/user.csv",
+        "docUrl": "https://cybozu.dev/ja/id/cb92d83020639643f0a82475/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/userOrganizations.csv",
+        "displayName": "ユーザーが所属する組織をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/userOrganizations.csv",
+        "docUrl": "https://cybozu.dev/ja/id/388f557472ba37a1593ee298/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/userGroups.csv",
+        "displayName": "ユーザーが所属するグループ（ロール）をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/userGroups.csv",
+        "docUrl": "https://cybozu.dev/ja/id/b47876a340675ed7a0d39d61/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/userServices.csv",
+        "displayName": "ユーザーの利用サービスをエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/userServices.csv",
+        "docUrl": "https://cybozu.dev/ja/id/5352f5d5cfb0e3f83fa8392b/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/organization.csv",
+        "displayName": "組織情報をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/organization.csv",
+        "docUrl": "https://cybozu.dev/ja/id/9b1580b31424c48e8b5300c1/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/group.csv",
+        "displayName": "グループ情報をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/group.csv",
+        "docUrl": "https://cybozu.dev/ja/id/5e88227272bc1e335d41cfe1/",
+        "bodyPlaceholder": "{}"
+      },
+      {
+        "name": "GET /v1/csv/title.csv",
+        "displayName": "役職情報をエクスポートする",
+        "method": "GET",
+        "endpoint": "/v1/csv/title.csv",
+        "docUrl": "https://cybozu.dev/ja/id/b5487bcda1e7905185b8f6bc/",
+        "bodyPlaceholder": "{}"
+      }
+    ]
+  }
+]

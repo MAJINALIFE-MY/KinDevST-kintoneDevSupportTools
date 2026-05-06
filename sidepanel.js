@@ -10,12 +10,15 @@ import { JSAPIDefinitionManager } from './js-api/js-api-definitions.js';
 import { JSAPIExecutor } from './js-api/js-api-executor.js';
 import { RESTAPIDefinitionManager } from './rest-api/rest-api-definitions.js';
 import { RESTAPIExecutor } from './rest-api/rest-api-executor.js';
+import { UserAPIDefinitionManager } from './user-api/user-api-definitions.js';
+import { UserAPIExecutor } from './user-api/user-api-executor.js';
 
 // ユーティリティモジュール
-import { 
-  API_TYPES, 
-  REST_DOM_IDS, 
-  JS_DOM_IDS, 
+import {
+  API_TYPES,
+  REST_DOM_IDS,
+  JS_DOM_IDS,
+  USER_DOM_IDS,
   CONFIG_DOM_IDS,
   HISTORY_CONFIG,
   TIMING,
@@ -36,6 +39,7 @@ import { RestApiDisplay, JsApiDisplay } from './ui/api-display.js';
 // API実行ハンドラー
 import { RestApiHandler } from './api/rest-api-handler.js';
 import { JsApiHandler } from './api/js-api-handler.js';
+import { UserApiHandler } from './api/user-api-handler.js';
 
 // ===== グローバルインスタンス =====
 
@@ -44,16 +48,21 @@ const jsApiDefinitionManager = new JSAPIDefinitionManager();
 const jsApiExecutor = new JSAPIExecutor(jsApiDefinitionManager);
 const restApiDefinitionManager = new RESTAPIDefinitionManager();
 const restApiExecutor = new RESTAPIExecutor(restApiDefinitionManager);
+const userApiDefinitionManager = new UserAPIDefinitionManager();
+const userApiExecutor = new UserAPIExecutor(userApiDefinitionManager);
 
 // UIコンポーネント
 let tabManager;
 let authSectionManager;
 let restApiSelector;
 let jsApiSelector;
+let userApiSelector;
 let restApiDisplay;
 let jsApiDisplay;
+let userApiDisplay;
 let restApiHandler;
 let jsApiHandler;
+let userApiHandler;
 
 // ===== 初期化 =====
 
@@ -65,12 +74,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tabId === API_TYPES.REST) {
         const restHistory = await HistoryManager.getByType(API_TYPES.REST);
         if (restHistory.length > 0 && restApiHandler && jsApiHandler) {
-          await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
+          await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
         }
       } else if (tabId === API_TYPES.JS) {
         const jsHistory = await HistoryManager.getByType(API_TYPES.JS);
         if (jsHistory.length > 0 && restApiHandler && jsApiHandler) {
-          await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
+          await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+        }
+      } else if (tabId === API_TYPES.USER) {
+        const userHistory = await HistoryManager.getByType(API_TYPES.USER);
+        if (userHistory.length > 0 && userApiHandler) {
+          await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
         }
       }
     }
@@ -87,7 +101,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // JSON定義の読み込み
   await jsApiDefinitionManager.loadDefinitions('./js-api/js-api-definitions.json');
   await restApiDefinitionManager.loadDefinitions('./rest-api/rest-api-definitions.json');
-  
+  await userApiDefinitionManager.loadDefinitions('./user-api/user-api-definitions.json');
+
   // REST API表示管理の初期化
   restApiDisplay = new RestApiDisplay({
     definitionManager: restApiDefinitionManager,
@@ -125,7 +140,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     showDuplicateFlag: true
   });
   jsApiSelector.initialize();
-  
+
+  // User API表示管理の初期化
+  userApiDisplay = new RestApiDisplay({
+    definitionManager: userApiDefinitionManager,
+    docLinkId: USER_DOM_IDS.DOC_LINK,
+    infoDisplayId: USER_DOM_IDS.INFO_DISPLAY,
+    bodyInputId: USER_DOM_IDS.BODY,
+    historyListId: USER_DOM_IDS.HISTORY_LIST
+  });
+
+  // User APIセレクターの初期化
+  userApiSelector = new ApiSelector({
+    displaySelectorId: USER_DOM_IDS.SELECTOR_DISPLAY,
+    nameSelectorId: USER_DOM_IDS.SELECTOR_NAME,
+    definitionManager: userApiDefinitionManager,
+    onSelect: (apiName) => userApiDisplay.update(apiName),
+    includeCustomOption: false,
+    showDuplicateFlag: false
+  });
+  userApiSelector.initialize();
+
   // REST API実行ハンドラーの初期化
   restApiHandler = new RestApiHandler({
     definitionManager: restApiDefinitionManager,
@@ -141,7 +176,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     selector: jsApiSelector
   });
   jsApiHandler.setupExecuteButton();
-  
+
+  // User API実行ハンドラーの初期化
+  userApiHandler = new UserApiHandler({
+    definitionManager: userApiDefinitionManager,
+    executor: userApiExecutor,
+    selector: userApiSelector
+  });
+  userApiHandler.setupExecuteButton();
+
   // コピーボタンのセットアップ（実行結果表示エリアを削除したため、コピーボタンも不要）
   
   // 設定保存ボタンのセットアップ
@@ -173,14 +216,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 履歴を初期表示（履歴がない場合は初期メッセージが表示される）
   const restHistory = await HistoryManager.getByType(API_TYPES.REST);
   const jsHistory = await HistoryManager.getByType(API_TYPES.JS);
+  const userHistory = await HistoryManager.getByType(API_TYPES.USER);
 
-      if (restHistory.length > 0) {
-        await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
-      }
-      
-      if (jsHistory.length > 0) {
-        await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
-      }
+  if (restHistory.length > 0) {
+    await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+  }
+
+  if (jsHistory.length > 0) {
+    await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+  }
+
+  if (userHistory.length > 0) {
+    await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+  }
   
   // オートロック通知の受信処理
   setupAutoLockListener();
@@ -303,8 +351,9 @@ function setupConfigSaveButtons() {
       await HistoryManager.trimToLimit();
       
       // 履歴を再表示して設定を反映
-      await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
-      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler });
+      await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+      await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
       
       showSaveMessage(CONFIG_DOM_IDS.CONFIG_MESSAGE);
     });
@@ -317,6 +366,7 @@ function setupConfigSaveButtons() {
 function setupApiNameCopyButtons() {
   const restCopyBtn = document.getElementById(REST_DOM_IDS.COPY_NAME_BTN);
   const jsCopyBtn = document.getElementById(JS_DOM_IDS.COPY_NAME_BTN);
+  const userCopyBtn = document.getElementById(USER_DOM_IDS.COPY_NAME_BTN);
 
   async function copyApiName(apiName, definitionManager, buttonEl) {
     if (!apiName) return;
@@ -348,6 +398,12 @@ function setupApiNameCopyButtons() {
     jsCopyBtn.addEventListener('click', async () => {
       const apiName = jsApiSelector.getSelectedApiName();
       await copyApiName(apiName, jsApiDefinitionManager, jsCopyBtn);
+    });
+  }
+  if (userCopyBtn) {
+    userCopyBtn.addEventListener('click', async () => {
+      const apiName = userApiSelector.getSelectedApiName();
+      await copyApiName(apiName, userApiDefinitionManager, userCopyBtn);
     });
   }
 }
