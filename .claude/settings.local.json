@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\MyDev\\\\kintone\\\\KinDevST-kintoneDevSupportTools\" -Force)",
+      "Bash(Select-Object -Property Name, PSIsContainer)",
+      "Bash(python -c ' *)",
+      "Bash(python)",
+      "Bash(python -c \"import sys; print\\(sys.stdin.buffer.read\\(\\).decode\\('utf-8'\\)\\)\")"
+    ]
+  }
+}

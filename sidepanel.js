@@ -7,6 +7,7 @@
 
 // API定義・実行クラス
 import { JSAPIDefinitionManager } from './js-api/js-api-definitions.js';
+import { matchesScreenFilter } from './js-api/js-api-availability.js';
 import { JSAPIExecutor } from './js-api/js-api-executor.js';
 import { RESTAPIDefinitionManager } from './rest-api/rest-api-definitions.js';
 import { RESTAPIExecutor } from './rest-api/rest-api-executor.js';
@@ -137,9 +138,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     nameSelectorId: JS_DOM_IDS.SELECTOR_NAME,
     definitionManager: jsApiDefinitionManager,
     onSelect: (apiName) => jsApiDisplay.update(apiName),
-    showDuplicateFlag: true
+    showDuplicateFlag: true,
+    filterFn: (apiName) => {
+      const platform = document.querySelector(`input[name="${JS_DOM_IDS.FILTER_PLATFORM_NAME}"]:checked`)?.value || 'all';
+      const screen = document.getElementById(JS_DOM_IDS.FILTER_SCREEN)?.value || '';
+      const definition = jsApiDefinitionManager.getDefinition(apiName);
+      return matchesScreenFilter(definition, { platform, screen });
+    }
   });
   jsApiSelector.initialize();
+  setupJsApiFilter();
 
   // User API表示管理の初期化
   userApiDisplay = new RestApiDisplay({
@@ -406,6 +414,21 @@ function setupApiNameCopyButtons() {
       await copyApiName(apiName, userApiDefinitionManager, userCopyBtn);
     });
   }
+}
+
+/**
+ * JS API 画面フィルターのイベントをセットアップ
+ */
+function setupJsApiFilter() {
+  const screenSelect = document.getElementById(JS_DOM_IDS.FILTER_SCREEN);
+  const platformRadios = document.querySelectorAll(`input[name="${JS_DOM_IDS.FILTER_PLATFORM_NAME}"]`);
+
+  const onFilterChange = () => {
+    if (jsApiSelector) jsApiSelector.refresh();
+  };
+
+  screenSelect?.addEventListener('change', onFilterChange);
+  platformRadios.forEach(r => r.addEventListener('change', onFilterChange));
 }
 
 /**

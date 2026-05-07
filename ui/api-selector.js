@@ -26,7 +26,8 @@ export class ApiSelector {
     this.definitionManager = options.definitionManager;
     this.onSelect = options.onSelect || (() => {});
     this.showDuplicateFlag = options.showDuplicateFlag || false;
-    
+    this.filterFn = options.filterFn || null;
+
     this.displaySelector = null;
     this.nameSelector = null;
     this.isSyncing = false;
@@ -64,24 +65,27 @@ export class ApiSelector {
    */
   _populateOptions() {
     const categories = this.definitionManager.getCategories();
-    
+
     // 既存のオプションをクリア
     this.displaySelector.replaceChildren();
     this.nameSelector.replaceChildren();
-    
+
     // カテゴリごとにグループ化して追加
     categories.forEach(category => {
       const groupDisplay = document.createElement('optgroup');
       groupDisplay.label = category.category;
-      
+
       const groupName = document.createElement('optgroup');
       groupName.label = category.category;
-      
+
       if (category.apis) {
         category.apis.forEach(api => {
+          // フィルター判定
+          if (this.filterFn && !this.filterFn(api.name)) return;
+
           // 重複フラグの確認
           const isDuplicate = !!api.duplicate;
-          
+
           // 表示名を取得（重複APIの場合は参照先から取得）
           let displayName = api.displayName;
           if (!displayName && isDuplicate && api.duplicate) {
@@ -93,31 +97,34 @@ export class ApiSelector {
             // 既に解決済みで【重複】が付いていない場合は付与
             displayName = `【重複】${displayName}`;
           }
-          
+
           // 表示名が取得できない場合はAPI名を使用
           if (!displayName) {
             displayName = api.name;
           }
-          
+
           // 表示名用のオプション
           const optionDisplay = document.createElement('option');
           optionDisplay.value = api.name;
           optionDisplay.textContent = displayName;
           groupDisplay.appendChild(optionDisplay);
-          
+
           // API名用のオプション
           const optionName = document.createElement('option');
           optionName.value = api.name;
           // 重複の場合は【重複】を付与（showDuplicateFlagがtrueの場合のみ）
-          optionName.textContent = (this.showDuplicateFlag && isDuplicate) 
-            ? `【重複】${api.name}` 
+          optionName.textContent = (this.showDuplicateFlag && isDuplicate)
+            ? `【重複】${api.name}`
             : api.name;
           groupName.appendChild(optionName);
         });
       }
-      
-      this.displaySelector.appendChild(groupDisplay);
-      this.nameSelector.appendChild(groupName);
+
+      // 空の optgroup は追加しない
+      if (groupDisplay.children.length > 0) {
+        this.displaySelector.appendChild(groupDisplay);
+        this.nameSelector.appendChild(groupName);
+      }
     });
   }
 
@@ -176,6 +183,44 @@ export class ApiSelector {
       
       this.isSyncing = false;
     });
+  }
+
+  /**
+   * フィルター関数を設定
+   * @param {Function|null} filterFn - (apiName: string) => boolean
+   */
+  setFilter(filterFn) {
+    this.filterFn = filterFn;
+  }
+
+  /**
+   * フィルター変更後にオプションと Select2 を再構築
+   */
+  refresh() {
+    const $ = window.jQuery || window.$;
+    const currentValue = this.getSelectedApiName();
+
+    this._populateOptions();
+
+    if ($) {
+      $(this.displaySelector).select2('destroy').select2(SELECT2_OPTIONS.DISPLAY);
+      $(this.nameSelector).select2('destroy').select2(SELECT2_OPTIONS.NAME);
+    }
+
+    if (currentValue) {
+      const stillExists = Array.from(this.displaySelector.options).some(o => o.value === currentValue);
+      if (stillExists) {
+        this.setSelectedApiName(currentValue);
+      } else {
+        this.isSyncing = true;
+        if ($) {
+          $(this.displaySelector).val(null).trigger('change.select2');
+          $(this.nameSelector).val(null).trigger('change.select2');
+        }
+        this.isSyncing = false;
+        this.onSelect('');
+      }
+    }
   }
 
   /**

@@ -108,6 +108,32 @@
 
     <!-- JS API タブ -->
     <div id="js" class="tab-content">
+      <!-- 画面フィルター -->
+      <div id="js-api-filter" class="js-api-filter-section">
+        <div class="filter-row">
+          <span class="filter-label">Platform</span>
+          <div class="filter-radio-group">
+            <label class="radio-label"><input type="radio" name="js-filter-platform" value="all" checked> すべて</label>
+            <label class="radio-label"><input type="radio" name="js-filter-platform" value="pc"> PC</label>
+            <label class="radio-label"><input type="radio" name="js-filter-platform" value="mobile"> モバイル</label>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label class="filter-label" for="js-filter-screen">利用画面</label>
+          <select id="js-filter-screen" class="filter-screen-select">
+            <option value="">すべての画面</option>
+            <option value="record.index">レコード一覧</option>
+            <option value="record.detail">レコード詳細</option>
+            <option value="record.create">レコード追加</option>
+            <option value="record.edit">レコード編集</option>
+            <option value="record.print">レコード印刷</option>
+            <option value="report">グラフ</option>
+            <option value="portal">ポータル</option>
+            <option value="space.portal">スペースポータル</option>
+            <option value="plugin.config">プラグイン設定</option>
+          </select>
+        </div>
+      </div>
       <div class="form-group">
         <label>表示名</label>
         <select id="js-api-selector-display">

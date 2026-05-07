@@ -79,7 +79,10 @@ export const JS_DOM_IDS = {
   COPY_NAME_BTN: 'js-api-copy-name-btn',
   ARGS_CONTAINER: 'js-args-container',
   EXEC_BTN: 'js-exec-btn',
-  HISTORY_LIST: 'js-history-list'
+  HISTORY_LIST: 'js-history-list',
+  FILTER_SECTION: 'js-api-filter',
+  FILTER_SCREEN: 'js-filter-screen',
+  FILTER_PLATFORM_NAME: 'js-filter-platform'
 };
 
 // DOM要素ID（User API用）

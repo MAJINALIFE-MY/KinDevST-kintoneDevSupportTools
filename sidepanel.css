@@ -396,6 +396,55 @@ button.secondary-btn:hover {
   color: #555;
 }
 
+/* JS API フィルターセクション */
+.js-api-filter-section {
+  background: #f0f4ff;
+  border: 1px solid #d0d8f0;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  font-weight: bold;
+  font-size: 0.85em;
+  white-space: nowrap;
+  min-width: 52px;
+  margin-bottom: 0;
+}
+
+.filter-radio-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  font-size: 0.85em;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.filter-screen-select {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 0.85em;
+}
+
 .auth-settings-subsection {
   margin-bottom: 20px;
 }
