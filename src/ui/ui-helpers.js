@@ -83,6 +83,104 @@ export function hideSelectMessage(historyListId) {
 }
 
 /**
+ * 初回ガイド（空状態カード）を表示
+ * 履歴が1件もない初回起動時に、使い方の3ステップを案内する。
+ * api-select-message クラスを持たせることで、API選択時の hideSelectMessage /
+ * 履歴表示時の display() で既存メッセージと同様に除去される。
+ * @param {string} historyListId - 履歴リストのDOM要素ID
+ */
+export function showEmptyState(historyListId) {
+  const historyList = document.getElementById(historyListId);
+  if (!historyList) return;
+
+  const card = document.createElement('div');
+  card.className = 'api-select-message empty-state-card';
+
+  const title = document.createElement('p');
+  title.className = 'empty-state-title';
+  title.textContent = 'はじめに';
+  card.appendChild(title);
+
+  const steps = document.createElement('ol');
+  steps.className = 'empty-state-steps';
+  const stepTexts = [
+    'kintoneのページを開く（または Setting でタブを記憶）',
+    '上のドロップダウンからAPIを選択',
+    '実行 — 結果はここに表示されます'
+  ];
+  stepTexts.forEach((text) => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    steps.appendChild(li);
+  });
+  card.appendChild(steps);
+
+  const settingBtn = document.createElement('button');
+  settingBtn.type = 'button';
+  settingBtn.className = 'api-copy-name-btn';
+  settingBtn.dataset.openTab = 'config';
+  settingBtn.textContent = 'Settingを開く';
+  card.appendChild(settingBtn);
+
+  historyList.replaceChildren(card);
+}
+
+/**
+ * ボタンを実行中状態に切り替え/復帰
+ * @param {HTMLButtonElement|null} button - 対象ボタン
+ * @param {boolean} isLoading - 実行中にするか
+ * @param {string} loadingLabel - 実行中の表示ラベル
+ */
+export function setButtonLoading(button, isLoading, loadingLabel = '実行中…') {
+  if (!button) return;
+  if (isLoading) {
+    button.dataset.originalLabel = button.textContent;
+    button.textContent = loadingLabel;
+    button.disabled = true;
+    button.classList.add('is-loading');
+  } else {
+    if (button.dataset.originalLabel) {
+      button.textContent = button.dataset.originalLabel;
+      delete button.dataset.originalLabel;
+    }
+    button.disabled = false;
+    button.classList.remove('is-loading');
+  }
+}
+
+/**
+ * 入力欄にバリデーションエラーを表示（次の入力で自動的に消える）
+ * @param {HTMLElement} input - 入力要素
+ * @param {string} message - エラーメッセージ
+ */
+export function showInputError(input, message) {
+  if (!input) return;
+  clearInputError(input);
+  input.classList.add('input-error');
+
+  const messageElement = document.createElement('div');
+  messageElement.className = 'input-error-message';
+  messageElement.textContent = message;
+  input.insertAdjacentElement('afterend', messageElement);
+
+  input.addEventListener('input', () => clearInputError(input), { once: true });
+  input.focus();
+}
+
+/**
+ * 入力欄のバリデーションエラーを消去
+ * @param {HTMLElement} input - 入力要素
+ */
+export function clearInputError(input) {
+  if (!input) return;
+  input.classList.remove('input-error');
+  const next = input.nextElementSibling;
+  if (next && next.classList.contains('input-error-message')) {
+    next.remove();
+  }
+}
+
+/**
  * ラベルとサンプルボタンを含むコンテナを作成
  * @param {HTMLElement} label - ラベル要素
  * @param {HTMLButtonElement|null} sampleButton - サンプルボタン（オプション）

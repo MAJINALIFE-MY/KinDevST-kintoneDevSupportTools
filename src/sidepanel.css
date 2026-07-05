@@ -1,0 +1,888 @@
+/* ==========================================================================
+   KinDevST デザイントークン
+   色はアクセント1色（kintone青）＋セマンティック色（成功/警告/危険）のみ。
+   新しい色を追加する前に、既存トークンで表現できないか検討すること。
+   ========================================================================== */
+:root {
+  --accent: #2c5cff;
+  --accent-hover: #1f47d6;
+  --accent-soft: #eef2ff;
+  --success: #1a9c55;
+  --success-soft: #e6f6ee;
+  --warning: #b45f06;
+  --warning-soft: #fdf3e3;
+  --danger: #d93025;
+  --danger-soft: #fdecea;
+  --text-1: #333;
+  --text-2: #666;
+  --text-3: #999;
+  --bg: #f5f5f5;
+  --surface: #fff;
+  --border: #ddd;
+  --border-light: #e0e0e0;
+  --code-bg: #f8f9fa;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --radius: 4px;
+  --radius-lg: 6px;
+  --font-mono: ui-monospace, Consolas, "Courier New", monospace;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text-1);
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+}
+
+/* タブのスタイル */
+.tabs {
+  display: flex;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-weight: bold;
+  color: var(--text-2);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background-color: var(--code-bg);
+}
+
+.tab-button.active {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* コンテンツエリアのスタイル */
+.tab-content {
+  display: none;
+  padding: 15px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* 横スクロールバーを防止 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* フォーム要素の共通スタイル */
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  box-sizing: border-box; /* paddingを含めた幅にする */
+  font-family: var(--font-mono);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ===== ボタン階層 =====
+   primary: 実行ボタンのみ（画面で唯一の塗りつぶし）
+   secondary: 設定内の操作ボタン
+   ghost系: 履歴内の再実行・コピー・削除、サンプル入力、API名コピー */
+
+button.primary-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.15s;
+}
+
+button.primary-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+button.primary-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+button.secondary-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.15s;
+}
+
+button.secondary-btn:hover {
+  background-color: var(--accent-soft);
+}
+
+/* ghost系ボタン共通 */
+.history-rerun-btn,
+.history-copy-btn,
+.history-delete-btn,
+.sample-input-btn,
+.api-copy-name-btn {
+  padding: 3px 10px;
+  font-size: 0.8em;
+  background-color: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.history-rerun-btn:hover,
+.history-copy-btn:hover,
+.sample-input-btn:hover,
+.api-copy-name-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+}
+
+.history-delete-btn:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+  background-color: var(--danger-soft);
+}
+
+.history-rerun-btn:disabled,
+.history-copy-btn:disabled,
+.history-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ボタンの一時フィードバック（Copied! / Error 等） */
+.feedback-success {
+  color: #fff !important;
+  background-color: var(--success) !important;
+  border-color: var(--success) !important;
+}
+
+.feedback-error {
+  color: #fff !important;
+  background-color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+
+.feedback-muted {
+  color: var(--text-3) !important;
+}
+
+/* 実行中スピナー */
+button.is-loading::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: var(--space-2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: kdst-spin 0.7s linear infinite;
+  vertical-align: -2px;
+}
+
+@keyframes kdst-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ヘッダー表示エリア */
+.headers-area {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.headers-section {
+  margin-bottom: 15px;
+}
+
+.headers-section:last-child {
+  margin-bottom: 0;
+}
+
+.headers-section label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--text-1);
+}
+
+.headers-section pre {
+  margin: 0;
+  padding: 10px;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* ===== 履歴表示エリア ===== */
+
+/* 最新の実行結果 / 履歴 の見出し */
+.history-latest-heading,
+.history-heading {
+  font-size: 0.8em;
+  font-weight: bold;
+  color: var(--text-2);
+  margin: var(--space-4) 0 var(--space-2);
+}
+
+.history-latest-heading:first-child {
+  margin-top: 0;
+}
+
+.history-item {
+  margin-bottom: 10px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  position: relative;
+}
+
+/* 最新の実行結果はアクセントで強調 */
+.history-item--latest {
+  border-left: 3px solid var(--accent);
+}
+
+/* 2件目以降は折りたたみ（ヘッダークリックで展開） */
+.history-item--collapsible .history-item-header-row,
+.history-item--collapsible .history-item-api {
+  cursor: pointer;
+}
+
+.history-item--collapsed .history-item-body {
+  display: none;
+}
+
+.history-item-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.history-item-header {
+  flex: 0 0 30%;
+  font-size: 0.9em;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+}
+
+.history-buttons {
+  flex: 0 0 70%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.history-item-api {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.9em;
+  color: var(--text-1);
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  word-break: break-all;
+}
+
+.history-item-result {
+  margin-top: 5px;
+}
+
+.history-item-result pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 0.85em;
+  color: var(--text-1);
+  background-color: var(--code-bg);
+  padding: 8px;
+  border-radius: var(--radius);
+}
+
+/* ===== バッジ ===== */
+
+/* HTTPメソッドバッジ（API情報表示・履歴共通） */
+.api-method,
+.method-badge {
+  padding: 2px 8px;
+  background-color: var(--accent);
+  color: white;
+  border-radius: var(--radius);
+  font-size: 0.85em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.method-badge {
+  font-size: 0.75em;
+  padding: 1px 6px;
+}
+
+.method-get { background-color: var(--accent); }
+.method-post { background-color: var(--success); }
+.method-put { background-color: var(--warning); }
+.method-delete { background-color: var(--danger); }
+
+/* ステータスコードバッジ */
+.status-badge {
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 0.75em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.status-2xx { background-color: var(--success-soft); color: var(--success); }
+.status-3xx { background-color: var(--accent-soft); color: var(--accent); }
+.status-4xx { background-color: var(--warning-soft); color: var(--warning); }
+.status-5xx,
+.status-error { background-color: var(--danger-soft); color: var(--danger); }
+
+/* ===== 設定画面 ===== */
+
+.auth-method-section {
+  display: none;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+}
+
+.auth-method-section.active {
+  display: block;
+}
+
+/* 設定カード（details/summary） */
+.settings-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-3);
+}
+
+.settings-card summary {
+  padding: var(--space-3) var(--space-4);
+  font-weight: bold;
+  font-size: 0.95em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-card summary:hover {
+  color: var(--accent);
+}
+
+.settings-card-body {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.settings-autosave-note {
+  color: var(--text-3);
+  font-size: 0.8em;
+  text-align: center;
+  margin: var(--space-3) 0;
+}
+
+.subsection-title {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.settings-card-body .subsection-title:first-child {
+  margin-top: 0;
+}
+
+/* 記憶中のタブ情報 */
+.tab-info-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.tab-info-url {
+  word-break: break-all;
+  font-size: 0.9em;
+  color: var(--text-2);
+}
+
+/* ===== Select2のスタイル調整 ===== */
+.select2-container {
+  width: 100% !important;
+  max-width: 100%; /* 幅を制限 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.select2-container--default .select2-selection--single {
+  height: 38px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 38px;
+  padding-left: 8px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 36px;
+}
+
+.select2-dropdown {
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  z-index: 9999;
+  max-width: 100%; /* 幅を制限 */
+  box-sizing: border-box; /* paddingを含めた幅にする */
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--accent);
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+}
+
+/* ===== API情報表示エリア ===== */
+.api-info-display {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+}
+
+.api-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.api-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.api-info-label {
+  font-weight: bold;
+  color: var(--text-2);
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.api-endpoint {
+  color: var(--text-1);
+  word-break: break-all;
+}
+
+/* ===== JS API フィルターセクション ===== */
+.js-api-filter-section {
+  background: var(--accent-soft);
+  border: 1px solid #d0d8f0;
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  font-weight: bold;
+  font-size: 0.85em;
+  white-space: nowrap;
+  min-width: 52px;
+  margin-bottom: 0;
+}
+
+.filter-radio-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  font-size: 0.85em;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.filter-screen-select {
+  flex: 1;
+  padding: 4px 6px;
+  font-size: 0.85em;
+}
+
+/* チェックボックスラベル */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* 読み取り専用入力フィールド */
+input[readonly] {
+  background-color: #eee;
+}
+
+/* 説明テキスト */
+.help-text {
+  color: var(--text-2);
+  font-size: 0.8em;
+}
+
+.help-text-block {
+  color: var(--text-2);
+  font-size: 0.8em;
+  display: block;
+  margin-top: 5px;
+}
+
+/* セッション認証の説明 */
+.auth-description {
+  font-size: 0.9em;
+}
+
+/* ボタンのマージン調整 */
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+/* ===== 通知（トースト） ===== */
+#toast-container {
+  position: fixed;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  right: var(--space-4);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background-color: #323232;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-size: 0.9em;
+  animation: toast-in 0.2s ease-out;
+  transition: opacity 0.2s;
+}
+
+.toast--success { background-color: var(--success); }
+.toast--error { background-color: var(--danger); }
+
+.toast--closing {
+  opacity: 0;
+}
+
+.toast-message {
+  flex: 1;
+  word-break: break-word;
+}
+
+.toast-action {
+  background: none;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1em;
+  white-space: nowrap;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ===== 入力バリデーションエラー ===== */
+textarea.input-error {
+  border-color: var(--danger);
+}
+
+.input-error-message {
+  color: var(--danger);
+  font-size: 0.8em;
+  margin-top: var(--space-1);
+}
+
+/* ===== 実行先未設定バナー ===== */
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--accent-soft);
+  border: 1px solid #d0d8f0;
+  color: var(--text-1);
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85em;
+  margin-bottom: var(--space-3);
+}
+
+.info-banner-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1em;
+  white-space: nowrap;
+}
+
+/* ドキュメントリンク */
+.doc-link {
+  margin-top: 5px;
+  font-size: 0.9em;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 結果ヘッダー */
+.result-header {
+  font-size: 0.9em;
+  color: var(--text-2);
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+}
+
+/* 履歴コンテナ */
+.history-container {
+  margin-top: 20px;
+}
+
+.history-title {
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+/* 位置指定 */
+.position-relative {
+  position: relative;
+}
+
+/* サンプル入力ボタンの配置 */
+.sample-input-btn {
+  margin-left: 10px;
+}
+
+/* ラベルとボタンのコンテナ */
+.label-with-button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+/* 引数ラベル（無効化） */
+.arg-label-disabled {
+  color: var(--text-3);
+}
+
+/* 引数説明文 */
+.arg-description {
+  font-size: 0.85em;
+  color: var(--text-2);
+  margin-top: 2px;
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+/* 無効化された入力フィールド */
+.input-disabled {
+  background-color: var(--bg);
+  cursor: not-allowed;
+}
+
+/* 引数なしメッセージ */
+.no-args-message {
+  color: var(--text-2);
+  font-size: 0.9em;
+}
+
+/* API選択メッセージ */
+.api-select-message {
+  color: var(--text-3);
+  font-size: 0.9em;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* 初回ガイド（履歴ゼロ時の空状態カード） */
+.empty-state-card {
+  text-align: left;
+  color: var(--text-1);
+  background-color: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.empty-state-title {
+  font-weight: bold;
+  margin: 0 0 var(--space-2);
+}
+
+.empty-state-steps {
+  margin: 0 0 var(--space-3);
+  padding-left: 20px;
+  color: var(--text-2);
+  font-size: 0.9em;
+  line-height: 1.8;
+}
+
+/* 履歴アイテム内のラベル */
+.history-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--text-1);
+}
+
+.history-label-margin {
+  margin-top: 15px;
+}
+
+/* 履歴アイテム内のpre */
+.history-pre {
+  margin: 0;
+  padding: 10px;
+  background-color: var(--code-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.history-pre-scrollable {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.history-pre-large {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* エラー表示 */
+.history-pre-error {
+  color: var(--danger);
+}
+
+/* 非表示 */
+.hidden {
+  display: none;
+}

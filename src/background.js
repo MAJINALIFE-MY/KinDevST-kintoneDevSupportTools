@@ -10,63 +10,8 @@ import {
   buildRequestOptions,
   executeRestApiRequest
 } from './utils/rest-api-utils.js';
-import { ERROR_MESSAGES, STORAGE_KEYS, AUTH_TYPES } from './utils/constants.js';
-
-// ===== オートロック機能 =====
-
-// アイドル検知の間隔（15分 = 900秒）
-const IDLE_THRESHOLD_SECONDS = 900;
-
-// アイドル検知の初期化
-chrome.idle.setDetectionInterval(IDLE_THRESHOLD_SECONDS);
-
-// アイドル状態変化のリスナー
-chrome.idle.onStateChanged.addListener(async (newState) => {
-  if (newState === 'idle' || newState === 'locked') {
-    // 認証情報を保存する方式（パスワード、APIトークン、OAuth）の場合のみオートロックを実行
-    // セッション認証（Cookie使用）の場合は認証情報を保存していないため、オートロックを実行しない
-    const authConfig = await getAuthConfigFromSession();
-    
-    if (authConfig && authConfig.authType && authConfig.authType !== AUTH_TYPES.SESSION) {
-      // 認証情報を削除
-      await clearAuthCredentials();
-      console.log(`[KinDevST Background] Auto-Lock: State ${newState} - Session cleared.`);
-      
-      // サイドパネルにログアウト通知を送信
-      try {
-        chrome.runtime.sendMessage({ type: 'EVENT_LOGOUT' }).catch(() => {
-          // サイドパネルが開いていない場合はエラーになるが、無視する
-        });
-      } catch (e) {
-        // エラーは無視
-      }
-    }
-  }
-});
-
-/**
- * セッションストレージから認証設定を取得（オートロック判定用）
- * @returns {Promise<Object|null>} 認証設定オブジェクト
- */
-async function getAuthConfigFromSession() {
-  const items = await chrome.storage.session.get([STORAGE_KEYS.AUTH_TYPE]);
-  return items[STORAGE_KEYS.AUTH_TYPE] ? { authType: items[STORAGE_KEYS.AUTH_TYPE] } : null;
-}
-
-/**
- * 認証情報をクリア（オートロック用）
- * @returns {Promise<void>}
- */
-async function clearAuthCredentials() {
-  await chrome.storage.session.remove([
-    STORAGE_KEYS.AUTH_TYPE,
-    STORAGE_KEYS.AUTH_USER,
-    STORAGE_KEYS.AUTH_PASS,
-    STORAGE_KEYS.AUTH_API_TOKEN,
-    STORAGE_KEYS.OAUTH_CLIENT_ID,
-    STORAGE_KEYS.OAUTH_CLIENT_SECRET
-  ]);
-}
+import { ERROR_MESSAGES, STORAGE_KEYS } from './utils/constants.js';
+import { assertKintoneUrl } from './utils/domain-validator.js';
 
 // ===== ログ出力ヘルパー =====
 
@@ -98,6 +43,12 @@ chrome.action.onClicked.addListener((tab) => {
 // REST API実行のメッセージハンドラー
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'REST_API_EXECUTE') {
+    // 送信元検証: 本拡張自身から送られたメッセージのみ受理する
+    // （外部拡張・Webページからの externally_connectable 経由の呼び出しを排除）
+    if (sender.id !== chrome.runtime.id) {
+      sendResponse({ success: false, error: ERROR_MESSAGES.UNEXPECTED_RESPONSE });
+      return false;
+    }
     handleRESTAPIExecution(request)
       .then(data => sendResponse({ success: true, data: data }))
       .catch(error => sendResponse({ success: false, error: error.message }));
@@ -200,19 +151,23 @@ async function getRequestTokenFromPage(tabId) {
 }
 
 /**
- * Service WorkerからREST APIを実行（パスワード/APIトークン/OAuth認証用）
+ * Service WorkerからREST APIを実行（パスワード/APIトークン認証用）
  */
 async function executeFromServiceWorker(method, endpoint, params, domain, authConfig) {
   const baseUrl = `https://${domain}`;
-  
+
+  // 最終防衛線: 認証ヘッダー付きリクエストを送る直前にドメインを厳密検証する。
+  // 部分文字列一致をすり抜けた不正ドメインへ認証情報が漏れるのを防ぐ。
+  assertKintoneUrl(baseUrl, ERROR_MESSAGES.INVALID_KINTONE_DOMAIN);
+
   // 認証ヘッダーを構築
   const authHeaders = buildAuthHeaders(authConfig);
   
   // URLを構築
   const url = buildRequestUrl(baseUrl, endpoint, method, params);
-  
-  // リクエストオプションを構築
-  const options = buildRequestOptions(method, params, authHeaders, false);
+
+  // リクエストオプションを構築（認証ヘッダー付与、Cookie は使わない）
+  const options = buildRequestOptions(method, params, { additionalHeaders: authHeaders });
   
   // リクエスト実行
   return await executeRestApiRequest(url, options);
@@ -249,15 +204,7 @@ function buildAuthHeaders(authConfig) {
       }
       headers['X-Cybozu-API-Token'] = authConfig.apiToken;
       break;
-      
-    case 'oauth':
-      // OAuth認証（アクセストークンが必要）
-      if (!authConfig.accessToken) {
-        throw new Error(ERROR_MESSAGES.AUTH_OAUTH_TOKEN_REQUIRED);
-      }
-      headers['Authorization'] = `Bearer ${authConfig.accessToken}`;
-      break;
-      
+
     case 'session':
       // セッション認証はContent Script経由で実行されるため、ここには来ない
       throw new Error(ERROR_MESSAGES.AUTH_SESSION_VIA_CONTENT_SCRIPT);

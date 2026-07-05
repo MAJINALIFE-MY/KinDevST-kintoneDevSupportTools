@@ -9,12 +9,6 @@
 export const STORAGE_KEYS = {
   HISTORY: 'api_execution_history',
   HISTORY_LIMIT: 'history_limit',
-  AUTH_TYPE: 'authType',
-  AUTH_USER: 'authUser',
-  AUTH_PASS: 'authPass',
-  AUTH_API_TOKEN: 'authApiToken',
-  OAUTH_CLIENT_ID: 'oauthClientId',
-  OAUTH_CLIENT_SECRET: 'oauthClientSecret',
   SHOW_REQUEST_HEADERS: 'showRequestHeaders',
   SHOW_STATUS_CODE: 'showStatusCode',
   SHOW_RESPONSE_HEADERS: 'showResponseHeaders',
@@ -47,16 +41,7 @@ export const API_TYPES = {
 export const AUTH_TYPES = {
   PASSWORD: 'password',
   TOKEN: 'token',
-  OAUTH: 'oauth',
   SESSION: 'session'
-};
-
-// kintoneドメインパターン
-export const KINTONE_DOMAIN_PATTERN = '.cybozu.com';
-
-// メッセージタイプ（バックグラウンドとの通信用）
-export const MESSAGE_TYPES = {
-  REST_API_EXECUTE: 'REST_API_EXECUTE'
 };
 
 // DOM要素ID（REST API用）
@@ -103,9 +88,6 @@ export const CONFIG_DOM_IDS = {
   AUTH_USER: 'auth-user',
   AUTH_PASS: 'auth-pass',
   AUTH_API_TOKEN: 'auth-api-token',
-  OAUTH_CLIENT_ID: 'oauth-client-id',
-  OAUTH_CLIENT_SECRET: 'oauth-client-secret',
-  OAUTH_REDIRECT_URI: 'oauth-redirect-uri',
   HISTORY_LIMIT: 'history-limit',
   SHOW_REQUEST_HEADERS: 'show-request-headers',
   SHOW_STATUS_CODE: 'show-status-code',
@@ -117,12 +99,7 @@ export const CONFIG_DOM_IDS = {
   COPY_INCLUDE_DISPLAY_NAME: 'copy-include-display-name',
   COPY_INCLUDE_API_NAME: 'copy-include-api-name',
   COPY_INCLUDE_URL: 'copy-include-url',
-  SAVE_CONFIG_BTN: 'save-config-btn',
-  SAVE_HISTORY_CONFIG_BTN: 'save-history-config-btn',
-  CONFIG_MESSAGE: 'config-message',
-  HISTORY_CONFIG_MESSAGE: 'history-config-message',
   SAVE_TAB_BTN: 'save-tab-btn',
-  TAB_MESSAGE: 'tab-message',
   TAB_INFO_DISPLAY: 'tab-info-display'
 };
 
@@ -159,7 +136,7 @@ export const TIMING = {
   JQUERY_WAIT_TIMEOUT: 5000,           // jQuery読み込み待機タイムアウト
   JQUERY_WAIT_INTERVAL: 50,            // jQuery読み込みチェック間隔
   CONTENT_SCRIPT_INJECT_WAIT: 100,     // Content Script注入後の待機時間
-  SAVE_MESSAGE_DISPLAY: 2000,          // 保存完了メッセージ表示時間
+  INPUT_DEBOUNCE: 300,                 // 数値入力の自動保存デバウンス時間
   BUTTON_FEEDBACK_DISPLAY: 1500        // ボタンフィードバック表示時間
 };
 
@@ -173,7 +150,6 @@ export const UI_CONFIG = {
 // エラーメッセージ
 export const ERROR_MESSAGES = {
   NO_ACTIVE_TAB: 'アクティブなタブが見つかりません',
-  NOT_KINTONE_PAGE: 'kintoneのページが開かれていません',
   NOT_KINTONE_PAGE_DETAIL: 'kintoneのページが開かれていません (URLに.cybozu.comが含まれていません)',
   CONTENT_SCRIPT_INJECTION_FAILED: 'Content Scriptの注入に失敗しました',
   UNEXPECTED_RESPONSE: '予期しないレスポンス形式',
@@ -185,12 +161,13 @@ export const ERROR_MESSAGES = {
   // 認証関連
   AUTH_PASSWORD_REQUIRED: 'パスワード認証にはログイン名とパスワードが必要です',
   AUTH_TOKEN_REQUIRED: 'APIトークンが設定されていません',
-  AUTH_OAUTH_TOKEN_REQUIRED: 'OAuthアクセストークンが設定されていません',
   AUTH_SESSION_VIA_CONTENT_SCRIPT: 'セッション認証はContent Script経由で実行する必要があります',
   AUTH_UNKNOWN_TYPE: '不明な認証方式',
   // タブ関連
   KINTONE_TAB_NOT_FOUND: '記憶されたkintoneタブが見つかりません。タブが閉じられた可能性があります。Settingタブで再度タブを記憶してください。',
   NOT_KINTONE_TAB: '現在開いているタブはkintoneのページではありません。',
+  // ドメイン検証関連
+  INVALID_KINTONE_DOMAIN: '実行先が有効なkintoneドメイン（*.cybozu.com）ではないため、リクエストを中止しました。',
   // CSRFトークン関連
   CSRF_TOKEN_FETCH_FAILED: 'CSRFトークンの取得に失敗しました',
   CSRF_TOKEN_EMPTY: 'CSRFトークンが空です'

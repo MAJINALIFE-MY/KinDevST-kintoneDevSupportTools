@@ -133,7 +133,12 @@ export class RestApiDisplay {
       apiInfoDisplay.style.display = 'block';
       const methodSpan = apiInfoDisplay.querySelector('.api-method');
       const endpointSpan = apiInfoDisplay.querySelector('.api-endpoint');
-      if (methodSpan) methodSpan.textContent = definition.method || '';
+      if (methodSpan) {
+        const method = (definition.method || '').toUpperCase();
+        methodSpan.textContent = method;
+        // メソッドごとの色分け（GET=accent / POST=success / PUT=warning / DELETE=danger）
+        methodSpan.className = 'api-method' + (method ? ` method-${method.toLowerCase()}` : '');
+      }
       if (endpointSpan) endpointSpan.textContent = definition.endpoint || '';
     }
     

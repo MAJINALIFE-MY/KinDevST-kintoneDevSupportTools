@@ -1,6 +1,7 @@
 'use strict';
 
 import { ERROR_MESSAGES } from '../utils/constants.js';
+import { isKintoneUrl } from '../utils/domain-validator.js';
 
 // API実行クラス
 export class JSAPIExecutor {
@@ -21,8 +22,8 @@ export class JSAPIExecutor {
       throw new Error(ERROR_MESSAGES.NO_ACTIVE_TAB);
     }
 
-    // URLチェック (簡易)
-    if (!tab.url || !tab.url.includes('.cybozu.com')) {
+    // URLチェック（ラベル境界で *.cybozu.com に厳密一致）
+    if (!isKintoneUrl(tab.url)) {
       throw new Error(ERROR_MESSAGES.NOT_KINTONE_PAGE_DETAIL);
     }
 

@@ -34,7 +34,7 @@
           <button type="button" id="rest-api-copy-name-btn" class="api-copy-name-btn">API名をコピー</button>
         </div>
       </div>
-      
+
       <!-- API選択時の情報表示 -->
       <div id="rest-api-info-display" class="api-info-display hidden">
         <div class="api-info-row">
@@ -46,18 +46,25 @@
           <span class="api-endpoint"></span>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label>Body(JSON) / Query Parameters</label>
         <textarea id="rest-body" placeholder=""></textarea>
         <small class="help-text">※GET/DELETEの場合はクエリパラメータ、POST/PUTの場合はボディとして使用</small>
       </div>
+
+      <!-- 実行先未設定バナー -->
+      <div class="info-banner hidden" data-banner="kintone-tab">
+        <span>kintoneタブが見つかりません。kintoneのページを開くか、タブを記憶してください。</span>
+        <button type="button" class="info-banner-link" data-open-tab="config">Settingを開く</button>
+      </div>
+
       <button id="rest-exec-btn" class="primary-btn">実行(REST)</button>
-      
+
       <!-- 履歴表示エリア -->
       <div id="rest-history-container" class="history-container">
         <div id="rest-history-list">
-          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+          <p class="api-select-message">APIを選択してください。</p>
         </div>
       </div>
     </div>
@@ -96,12 +103,19 @@
         <textarea id="user-body" placeholder=""></textarea>
         <small class="help-text">※GET/DELETEの場合はクエリパラメータ、POST/PUTの場合はボディとして使用</small>
       </div>
+
+      <!-- 実行先未設定バナー -->
+      <div class="info-banner hidden" data-banner="kintone-tab">
+        <span>kintoneタブが見つかりません。kintoneのページを開くか、タブを記憶してください。</span>
+        <button type="button" class="info-banner-link" data-open-tab="config">Settingを開く</button>
+      </div>
+
       <button id="user-exec-btn" class="primary-btn">実行(User API)</button>
 
       <!-- 履歴表示エリア -->
       <div id="user-history-container" class="history-container">
         <div id="user-history-list">
-          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+          <p class="api-select-message">APIを選択してください。</p>
         </div>
       </div>
     </div>
@@ -148,18 +162,24 @@
           <button type="button" id="js-api-copy-name-btn" class="api-copy-name-btn">API名をコピー</button>
         </div>
       </div>
-      
+
       <!-- 動的引数入力エリア -->
       <div id="js-args-container">
         <!-- JSで動的に生成 -->
       </div>
-      
+
+      <!-- 実行先未設定バナー -->
+      <div class="info-banner hidden" data-banner="kintone-tab">
+        <span>kintoneタブが見つかりません。kintoneのページを開くか、タブを記憶してください。</span>
+        <button type="button" class="info-banner-link" data-open-tab="config">Settingを開く</button>
+      </div>
+
       <button id="js-exec-btn" class="primary-btn">実行(JS API)</button>
-      
+
       <!-- 履歴表示エリア -->
       <div id="js-history-container" class="history-container">
         <div id="js-history-list">
-          <p class="api-select-message" style="color: #999; font-size: 0.9em; text-align: center; padding: 40px 20px;">APIを選択してください。</p>
+          <p class="api-select-message">APIを選択してください。</p>
         </div>
       </div>
     </div>
@@ -167,51 +187,48 @@
     <!-- Setting タブ -->
     <div id="config" class="tab-content">
       <!-- タブ設定 -->
-      <div class="tab-settings-section">
-        <h3 class="section-title">タブ設定</h3>
-        <div class="form-group">
-          <p class="auth-description">他のサイトのタブを開いていても、記憶したkintoneタブを使用してAPIを実行できます。</p>
-          <button id="save-tab-btn" class="secondary-btn">現在開いているタブを記憶</button>
-        </div>
-        <p id="tab-message" class="save-message">保存しました</p>
-        <div id="tab-info-display" class="auth-method-section hidden">
+      <details class="settings-card" open>
+        <summary>タブ設定</summary>
+        <div class="settings-card-body">
           <div class="form-group">
-            <div class="label-with-button">
-              <label>記憶中のタブ</label>
-              <button class="history-delete-btn" id="clear-tab-btn" title="記憶を削除">×</button>
-            </div>
-            <div class="tab-info-content">
-              <div class="tab-info-title"></div>
-              <div class="tab-info-url"></div>
+            <p class="auth-description">他のサイトのタブを開いていても、記憶したkintoneタブを使用してAPIを実行できます。</p>
+            <button id="save-tab-btn" class="secondary-btn">現在開いているタブを記憶</button>
+          </div>
+          <div id="tab-info-display" class="auth-method-section hidden">
+            <div class="form-group">
+              <div class="label-with-button">
+                <label>記憶中のタブ</label>
+                <button class="history-delete-btn" id="clear-tab-btn" title="記憶を削除">×</button>
+              </div>
+              <div class="tab-info-content">
+                <div class="tab-info-title"></div>
+                <div class="tab-info-url"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </details>
 
-      <!-- REST API設定 -->
-      <div class="rest-api-settings-section">
-        <h3 class="section-title">REST API設定</h3>
-        
-        <!-- 認証設定 -->
-        <div class="auth-settings-subsection">
-          <h4 class="subsection-title">認証設定</h4>
+      <!-- 認証設定 -->
+      <details class="settings-card" open>
+        <summary>認証設定（REST API / User API）</summary>
+        <div class="settings-card-body">
           <div class="form-group">
             <label>認証方式</label>
             <select id="auth-type">
               <option value="password">パスワード認証</option>
               <option value="token">APIトークン</option>
-              <option value="oauth">OAuth</option>
               <option value="session">セッション認証(Cookie)</option>
             </select>
           </div>
-          
+
           <!-- セキュリティ注意書き -->
           <div class="form-group">
-            <small class="help-text" style="color: #666; font-style: italic;">
-              ※パスワード等の認証情報は15分間無操作、または画面ロック時に自動削除されます
+            <small class="help-text">
+              ※パスワード等の認証情報は保存されません。実行のたびに入力欄の値を使用し、サイドパネルを閉じると消えます。
             </small>
           </div>
-          
+
           <!-- パスワード認証 -->
           <div id="auth-password" class="auth-method-section">
             <div class="form-group">
@@ -223,7 +240,7 @@
               <input type="password" id="auth-pass">
             </div>
           </div>
-          
+
           <!-- APIトークン -->
           <div id="auth-token" class="auth-method-section">
             <div class="form-group">
@@ -231,31 +248,18 @@
               <input type="password" id="auth-api-token">
             </div>
           </div>
-          
-          <!-- OAuth -->
-          <div id="auth-oauth" class="auth-method-section">
-            <div class="form-group">
-              <label>Client ID</label>
-              <input type="text" id="oauth-client-id">
-            </div>
-            <div class="form-group">
-              <label>Client Secret</label>
-              <input type="password" id="oauth-client-secret">
-            </div>
-            <div class="form-group">
-              <label>Redirect URI(Copy this)</label>
-              <input type="text" id="oauth-redirect-uri" readonly>
-            </div>
-          </div>
-          
+
           <!-- セッション認証 -->
           <div id="auth-session" class="auth-method-section">
             <p class="auth-description">現在ブラウザでログインしているセッションを利用します。設定は不要です。</p>
           </div>
         </div>
+      </details>
 
-        <!-- 表示設定 -->
-        <div class="display-settings-subsection">
+      <!-- 表示設定 -->
+      <details class="settings-card">
+        <summary>表示設定</summary>
+        <div class="settings-card-body">
           <h4 class="subsection-title">API名コピー時の形式</h4>
           <div class="form-group">
             <label class="checkbox-label">
@@ -275,7 +279,7 @@
               URL
             </label>
           </div>
-          <h4 class="subsection-title">表示設定 ログ</h4>
+          <h4 class="subsection-title">ログのボタン</h4>
           <div class="form-group">
             <label class="checkbox-label">
               <input type="checkbox" id="show-copy-button" checked>
@@ -294,7 +298,7 @@
               削除ボタンを表示
             </label>
           </div>
-          <h4 class="subsection-title">表示設定 REST API</h4>
+          <h4 class="subsection-title">REST APIログの項目</h4>
           <div class="form-group">
             <label class="checkbox-label">
               <input type="checkbox" id="show-request-headers" checked>
@@ -313,13 +317,26 @@
               Response Headers を表示
             </label>
           </div>
-
           <small class="help-text-block">※Response Bodyは常に表示されます</small>
         </div>
-        
-        <!-- 開発者向け設定 -->
-        <div class="display-settings-subsection">
-          <h4 class="subsection-title">開発者向け設定</h4>
+      </details>
+
+      <!-- 履歴設定 -->
+      <details class="settings-card">
+        <summary>履歴設定</summary>
+        <div class="settings-card-body">
+          <div class="form-group">
+            <label>実行結果の履歴保存数</label>
+            <input type="number" id="history-limit" min="1" max="30" value="10">
+            <small class="help-text-block">※最大30件まで保存できます（1-30の範囲で設定）</small>
+          </div>
+        </div>
+      </details>
+
+      <!-- 開発者向け設定 -->
+      <details class="settings-card">
+        <summary>開発者向け</summary>
+        <div class="settings-card-body">
           <div class="form-group">
             <label class="checkbox-label">
               <input type="checkbox" id="show-execution-log">
@@ -328,23 +345,9 @@
           </div>
           <small class="help-text-block">※有効にすると、API実行時のログがブラウザのコンソールに出力されます。エラーと警告は常に出力されます。</small>
         </div>
-      </div>
+      </details>
 
-      <!-- 履歴設定 -->
-      <div class="history-settings-section">
-        <h3 class="section-title">履歴設定</h3>
-        <div class="form-group">
-          <label>実行結果の履歴保存数</label>
-          <input type="number" id="history-limit" min="1" max="30" value="10">
-          <small class="help-text-block">※最大30件まで保存できます（1-30の範囲で設定）</small>
-        </div>
-      </div>
-
-      <!-- 設定保存 -->
-      <div class="settings-save-section">
-        <button id="save-config-btn" class="primary-btn">設定を保存</button>
-        <p id="config-message" class="save-message">保存しました</p>
-      </div>
+      <p class="settings-autosave-note">設定は変更すると自動で保存されます。</p>
     </div>
   </div>
   <!-- jQuery -->

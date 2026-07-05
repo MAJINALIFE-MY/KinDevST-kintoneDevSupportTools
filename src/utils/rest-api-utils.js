@@ -7,32 +7,46 @@
 
 /**
  * リクエストURLを構築
+ *
+ * セッション認証（Cookie）では POST/PUT の CSRF トークンはボディに、
+ * DELETE はクエリパラメータ（__REQUEST_TOKEN__）に付与する必要がある。
+ * requestToken を渡すと DELETE 時にクエリへトークンを追加する。
+ *
  * @param {string} baseUrl - ベースURL（例: "https://example.cybozu.com"）
  * @param {string} endpoint - エンドポイント（例: "/k/v1/record.json"）
  * @param {string} method - HTTPメソッド
  * @param {Object|null} params - リクエストパラメータ
+ * @param {string|null} requestToken - CSRFトークン（セッション認証の DELETE 用）
  * @returns {string} 構築されたURL
  */
-export function buildRequestUrl(baseUrl, endpoint, method, params) {
+export function buildRequestUrl(baseUrl, endpoint, method, params, requestToken = null) {
   let url = `${baseUrl}${endpoint}`;
-  
+
   // GET/DELETEの場合はクエリパラメータとして追加
-  if ((method === 'GET' || method === 'DELETE') && params) {
-    if (typeof params === 'object' && params !== null && !Array.isArray(params)) {
-      const queryString = new URLSearchParams();
-      Object.keys(params).forEach(key => {
-        const value = params[key];
-        if (value !== undefined && value !== null) {
-          queryString.append(key, String(value));
-        }
-      });
-      const queryStr = queryString.toString();
-      if (queryStr) {
-        url += `?${queryStr}`;
+  if ((method === 'GET' || method === 'DELETE') && params &&
+      typeof params === 'object' && !Array.isArray(params)) {
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      const value = params[key];
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
       }
+    });
+
+    // DELETEの場合はCSRFトークンをクエリパラメーターに追加
+    if (method === 'DELETE' && requestToken) {
+      queryParams.append('__REQUEST_TOKEN__', requestToken);
     }
+
+    const queryStr = queryParams.toString();
+    if (queryStr) {
+      url += `?${queryStr}`;
+    }
+  } else if (method === 'DELETE' && requestToken) {
+    // paramsがない場合でもDELETEならCSRFトークンを追加
+    url += `?__REQUEST_TOKEN__=${encodeURIComponent(requestToken)}`;
   }
-  
+
   return url;
 }
 
@@ -40,27 +54,36 @@ export function buildRequestUrl(baseUrl, endpoint, method, params) {
  * リクエストオプションを構築
  * @param {string} method - HTTPメソッド
  * @param {Object|null} params - リクエストパラメータ
- * @param {Object} additionalHeaders - 追加のヘッダー（認証ヘッダーなど）
- * @param {boolean} includeCredentials - credentials: 'include' を設定するか
+ * @param {Object} [opts] - オプション
+ * @param {Object} [opts.additionalHeaders] - 追加のヘッダー（認証ヘッダーなど）
+ * @param {boolean} [opts.includeCredentials] - credentials: 'include'（セッション認証）を設定するか
+ * @param {string|null} [opts.requestToken] - CSRFトークン（セッション認証の POST/PUT 用、ボディに付与）
  * @returns {Object} fetchオプション
  */
-export function buildRequestOptions(method, params, additionalHeaders = {}, includeCredentials = false) {
+export function buildRequestOptions(method, params, opts = {}) {
+  const { additionalHeaders = {}, includeCredentials = false, requestToken = null } = opts;
+
   const options = {
     method: method,
     headers: { ...additionalHeaders }
   };
-  
+
   if (includeCredentials) {
     options.credentials = 'include';
     options.headers['X-Requested-With'] = 'XMLHttpRequest';
   }
-  
-  // POST/PUTの場合はボディに追加
-  if (params && (method === 'POST' || method === 'PUT')) {
+
+  // POST/PUTの場合はボディに追加（セッション認証では CSRF トークンも含める）
+  const isWrite = method === 'POST' || method === 'PUT';
+  if (isWrite && (params || requestToken)) {
     options.headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(params);
+    const bodyParams = { ...(params || {}) };
+    if (requestToken) {
+      bodyParams.__REQUEST_TOKEN__ = requestToken;
+    }
+    options.body = JSON.stringify(bodyParams);
   }
-  
+
   return options;
 }
 

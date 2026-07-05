@@ -7,8 +7,9 @@
 
 import { STORAGE_KEYS, API_TYPES, CSS_CLASSES, TIMING } from './constants.js';
 import { formatCurrentDateTime } from './date-formatter.js';
-import { formatArgsForDisplay, formatArgsForRestCopy, formatArgsForJsCopy } from './arg-formatter.js';
+import { formatArgsForDisplay } from './arg-formatter.js';
 import { ConfigManager } from './config-manager.js';
+import { showToast } from '../ui/toast.js';
 
 /**
  * 履歴管理クラス
@@ -23,9 +24,10 @@ export class HistoryManager {
    * @param {Error|null} error - エラー（エラーの場合のみ）
    * @param {Object|null} requestHeaders - リクエストヘッダー（REST APIの場合のみ）
    * @param {Object|null} responseHeaders - レスポンスヘッダー（REST APIの場合のみ）
+   * @param {string|null} method - HTTPメソッド（REST/User APIの場合のみ）
    * @returns {Promise<void>}
    */
-  static async save(type, apiName, args, result, error = null, requestHeaders = null, statusCode = null, statusText = null, responseHeaders = null) {
+  static async save(type, apiName, args, result, error = null, requestHeaders = null, statusCode = null, statusText = null, responseHeaders = null, method = null) {
     const limit = await ConfigManager.getHistoryLimit();
     const { displayTime, timestamp } = formatCurrentDateTime();
 
@@ -36,9 +38,10 @@ export class HistoryManager {
       result: error ? null : JSON.stringify(result),
       error: error ? error.message : null,
       requestHeaders: requestHeaders ? JSON.stringify(requestHeaders) : null,
-      statusCode: statusCode != null ? statusCode : null,
+      statusCode: statusCode ?? null,
       statusText: statusText || null,
       responseHeaders: responseHeaders ? JSON.stringify(responseHeaders) : null,
+      method: method || null,
       timestamp,
       displayTime
     };
@@ -89,8 +92,17 @@ export class HistoryManager {
     }
   }
 
-  // ハンドラーを保存（削除後の再表示で使用）
+  // ハンドラーを保存（削除・再実行後の再表示で使用）
   static _handlers = null;
+
+  /**
+   * 再実行用のハンドラー束を一度だけ登録する
+   * 以降の display() 呼び出しは handlers 引数を省略できる。
+   * @param {Object} handlers - { rest, js, user } 各 API ハンドラー
+   */
+  static setHandlers(handlers) {
+    this._handlers = handlers;
+  }
 
   /**
    * 履歴を表示用のDOM要素に変換
@@ -129,13 +141,34 @@ export class HistoryManager {
     
     // ハンドラーが渡されなかった場合は保存されているハンドラーを使用
     const handlersToUse = handlers || this._handlers;
-    
-    for (const item of filteredHistory) {
-      const historyItem = await this._createHistoryItemElement(item, type, historyListId, handlersToUse);
+
+    // 最新の1件を主役として展開表示し、2件目以降は折りたたむ
+    for (let i = 0; i < filteredHistory.length; i++) {
+      const isLatest = i === 0;
+      if (isLatest) {
+        historyList.appendChild(this._createHeading('history-latest-heading', '最新の実行結果'));
+      } else if (i === 1) {
+        historyList.appendChild(this._createHeading('history-heading', '履歴'));
+      }
+      const historyItem = await this._createHistoryItemElement(filteredHistory[i], type, historyListId, handlersToUse, isLatest);
       historyList.appendChild(historyItem);
     }
-    
+
     if (onDisplayCallback) onDisplayCallback();
+  }
+
+  /**
+   * 履歴リストの見出し要素を生成
+   * @private
+   * @param {string} className - CSSクラス名
+   * @param {string} text - 見出しテキスト
+   * @returns {HTMLDivElement}
+   */
+  static _createHeading(className, text) {
+    const heading = document.createElement('div');
+    heading.className = className;
+    heading.textContent = text;
+    return heading;
   }
 
   /**
@@ -145,65 +178,18 @@ export class HistoryManager {
    * @param {string} type - API種別
    * @param {string} historyListId - 履歴リストのDOM要素ID
    * @param {Object} handlers - 再実行用のハンドラー { rest: RestApiHandler, js: JsApiHandler }
+   * @param {boolean} isLatest - 最新の実行結果かどうか（最新は展開、それ以外は折りたたみ）
    * @returns {Promise<HTMLElement>}
    */
-  static async _createHistoryItemElement(item, type, historyListId, handlers = null) {
+  static async _createHistoryItemElement(item, type, historyListId, handlers = null, isLatest = true) {
     const historyItem = document.createElement('div');
     historyItem.className = CSS_CLASSES.HISTORY_ITEM;
-    
-    // 日付とボタンのヘッダー行
-    const headerRow = document.createElement('div');
-    headerRow.className = 'history-item-header-row';
-    
-    // 日付
-    const dateDiv = document.createElement('div');
-    dateDiv.className = 'history-item-header';
-    dateDiv.textContent = item.displayTime;
-    headerRow.appendChild(dateDiv);
-    
-    // ボタンコンテナ
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = CSS_CLASSES.HISTORY_BUTTONS;
-    
-    // ボタン表示設定を取得
-    const buttonDisplayConfig = await ConfigManager.getButtonDisplayConfig();
-    
-    // 各ボタンを条件付きで追加
-    if (buttonDisplayConfig.showRerunButton) {
-      const rerunBtn = this._createRerunButton(item, type, historyListId, handlers);
-      if (rerunBtn) buttonContainer.appendChild(rerunBtn);
+    if (isLatest) {
+      historyItem.classList.add('history-item--latest');
+    } else {
+      historyItem.classList.add('history-item--collapsible', 'history-item--collapsed');
     }
-    
-    if (buttonDisplayConfig.showCopyButton) {
-      buttonContainer.appendChild(this._createCopyButton(item, type));
-    }
-    
-    if (buttonDisplayConfig.showDeleteButton) {
-      buttonContainer.appendChild(this._createDeleteButton(item, type, historyListId));
-    }
-    
-    // ボタンが1つでもある場合のみコンテナを追加
-    if (buttonContainer.children.length > 0) {
-      headerRow.appendChild(buttonContainer);
-    }
-    historyItem.appendChild(headerRow);
-    
-    // 実行API
-    const apiDiv = document.createElement('div');
-    apiDiv.className = 'history-item-api';
-    let argsDisplay = '()';
-    try {
-      const args = JSON.parse(item.args);
-      argsDisplay = formatArgsForDisplay(args);
-    } catch (e) {
-      argsDisplay = item.args || '()';
-    }
-    // API名から関数名部分を抽出（引数情報を削除）
-    // 例: "kintone.api.urlForGet(path, params, isGuestSpace)" -> "kintone.api.urlForGet"
-    const displayApiName = item.apiName.replace(/\(.*\)$/, '');
-    apiDiv.textContent = `${displayApiName}${argsDisplay}`;
-    historyItem.appendChild(apiDiv);
-    
+
     // 表示設定を取得
     let displayConfig = {
       showRequestHeaders: true,
@@ -214,6 +200,82 @@ export class HistoryManager {
       displayConfig = await ConfigManager.getRestApiDisplayConfig();
     }
 
+    // 日付とボタンのヘッダー行
+    const headerRow = document.createElement('div');
+    headerRow.className = 'history-item-header-row';
+
+    // 日付
+    const dateDiv = document.createElement('div');
+    dateDiv.className = 'history-item-header';
+    dateDiv.textContent = item.displayTime;
+    headerRow.appendChild(dateDiv);
+
+    // ボタンコンテナ
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = CSS_CLASSES.HISTORY_BUTTONS;
+
+    // ボタン表示設定を取得
+    const buttonDisplayConfig = await ConfigManager.getButtonDisplayConfig();
+
+    // 各ボタンを条件付きで追加
+    if (buttonDisplayConfig.showRerunButton) {
+      const rerunBtn = this._createRerunButton(item, type, historyListId, handlers);
+      if (rerunBtn) buttonContainer.appendChild(rerunBtn);
+    }
+
+    if (buttonDisplayConfig.showCopyButton) {
+      buttonContainer.appendChild(this._createCopyButton(item, type));
+    }
+
+    if (buttonDisplayConfig.showDeleteButton) {
+      buttonContainer.appendChild(this._createDeleteButton(item, type, historyListId));
+    }
+
+    // ボタンが1つでもある場合のみコンテナを追加
+    if (buttonContainer.children.length > 0) {
+      // ボタン操作は折りたたみトグルに伝播させない
+      buttonContainer.addEventListener('click', (e) => e.stopPropagation());
+      headerRow.appendChild(buttonContainer);
+    }
+    historyItem.appendChild(headerRow);
+
+    // 実行API（メソッドバッジ + API名 + ステータスバッジ）
+    const apiDiv = document.createElement('div');
+    apiDiv.className = 'history-item-api';
+
+    // メソッドバッジ（v2.1以前の履歴には method が無いため、その場合は非表示）
+    if (item.method) {
+      const methodBadge = document.createElement('span');
+      const method = String(item.method).toUpperCase();
+      methodBadge.className = `method-badge method-${method.toLowerCase()}`;
+      methodBadge.textContent = method;
+      apiDiv.appendChild(methodBadge);
+    }
+
+    let argsDisplay = '()';
+    try {
+      const args = JSON.parse(item.args);
+      argsDisplay = formatArgsForDisplay(args);
+    } catch (e) {
+      argsDisplay = item.args || '()';
+    }
+    // API名から関数名部分を抽出（引数情報を削除）
+    // 例: "kintone.api.urlForGet(path, params, isGuestSpace)" -> "kintone.api.urlForGet"
+    const displayApiName = item.apiName.replace(/\(.*\)$/, '');
+    apiDiv.appendChild(document.createTextNode(`${displayApiName}${argsDisplay}`));
+
+    // ステータスバッジ（折りたたみ状態でも成否がスキャンできるようにする）
+    const statusBadge = this._createStatusBadge(item, displayConfig);
+    if (statusBadge) {
+      apiDiv.appendChild(statusBadge);
+    }
+
+    historyItem.appendChild(apiDiv);
+
+    // 詳細部（折りたたみ対象）
+    const bodyDiv = document.createElement('div');
+    bodyDiv.className = 'history-item-body';
+
     // 最初のlabelかどうかを追跡するフラグ
     let isFirstLabel = true;
 
@@ -222,24 +284,24 @@ export class HistoryManager {
       try {
         const args = JSON.parse(item.args);
         if (args && args.length > 0 && args[0] && Object.keys(args[0]).length > 0) {
-          historyItem.appendChild(this._createLabel('Request Body:', isFirstLabel));
+          bodyDiv.appendChild(this._createLabel('Request Body:', isFirstLabel));
           isFirstLabel = false;
-          
+
           const requestBodyPre = this._createPre(JSON.stringify(args[0], null, 2), true);
-          historyItem.appendChild(requestBodyPre);
+          bodyDiv.appendChild(requestBodyPre);
         }
       } catch (e) {
         // パースエラーの場合はスキップ
       }
     }
-    
+
     // REST/User APIの場合、ヘッダー情報を表示（設定に基づいて表示/非表示を制御）
     if ((type === API_TYPES.REST || type === API_TYPES.USER) && (item.requestHeaders || item.statusCode !== null || item.responseHeaders)) {
       // Request Headers
       if (item.requestHeaders && displayConfig.showRequestHeaders) {
-        historyItem.appendChild(this._createLabel('Request Headers:', isFirstLabel));
+        bodyDiv.appendChild(this._createLabel('Request Headers:', isFirstLabel));
         isFirstLabel = false;
-        
+
         let headersText = '(ヘッダーなし)';
         try {
           const headers = JSON.parse(item.requestHeaders);
@@ -249,22 +311,22 @@ export class HistoryManager {
         } catch (e) {
           headersText = item.requestHeaders || '(ヘッダーなし)';
         }
-        historyItem.appendChild(this._createPre(headersText, true));
+        bodyDiv.appendChild(this._createPre(headersText, true));
       }
-      
+
       // Status Code
       if (item.statusCode !== null && item.statusCode !== undefined && displayConfig.showStatusCode) {
-        historyItem.appendChild(this._createLabel('Status Code:', isFirstLabel));
+        bodyDiv.appendChild(this._createLabel('Status Code:', isFirstLabel));
         isFirstLabel = false;
-        
-        historyItem.appendChild(this._createPre(`${item.statusCode} ${item.statusText || ''}`.trim(), false));
+
+        bodyDiv.appendChild(this._createPre(`${item.statusCode} ${item.statusText || ''}`.trim(), false));
       }
-      
+
       // Response Headers
       if (item.responseHeaders && displayConfig.showResponseHeaders) {
-        historyItem.appendChild(this._createLabel('Response Headers:', isFirstLabel));
+        bodyDiv.appendChild(this._createLabel('Response Headers:', isFirstLabel));
         isFirstLabel = false;
-        
+
         let headersText = '(ヘッダーなし)';
         try {
           const headers = JSON.parse(item.responseHeaders);
@@ -274,16 +336,16 @@ export class HistoryManager {
         } catch (e) {
           headersText = item.responseHeaders || '(ヘッダーなし)';
         }
-        historyItem.appendChild(this._createPre(headersText, true));
+        bodyDiv.appendChild(this._createPre(headersText, true));
       }
     }
-    
+
     // Response Body:
-    historyItem.appendChild(this._createLabel('Response Body:', isFirstLabel));
-    
+    bodyDiv.appendChild(this._createLabel('Response Body:', isFirstLabel));
+
     // 結果
     const resultPre = this._createPre('', false, true);
-    
+
     if (item.error) {
       resultPre.textContent = `エラーが発生しました:\n${item.error}`;
       resultPre.classList.add('history-pre-error');
@@ -297,10 +359,44 @@ export class HistoryManager {
     } else {
       resultPre.textContent = '結果なし';
     }
-    
-    historyItem.appendChild(resultPre);
-    
+
+    bodyDiv.appendChild(resultPre);
+    historyItem.appendChild(bodyDiv);
+
+    // 2件目以降はヘッダー/API行クリックで展開・折りたたみをトグル
+    if (!isLatest) {
+      const toggleCollapse = () => historyItem.classList.toggle('history-item--collapsed');
+      headerRow.addEventListener('click', toggleCollapse);
+      apiDiv.addEventListener('click', toggleCollapse);
+    }
+
     return historyItem;
+  }
+
+  /**
+   * ステータスバッジ要素を生成
+   * @private
+   * @param {Object} item - 履歴アイテム
+   * @param {Object} displayConfig - REST API表示設定
+   * @returns {HTMLSpanElement|null} バッジ要素（表示対象がない場合はnull）
+   */
+  static _createStatusBadge(item, displayConfig) {
+    if (item.error && (item.statusCode === null || item.statusCode === undefined)) {
+      const badge = document.createElement('span');
+      badge.className = 'status-badge status-error';
+      badge.textContent = 'Error';
+      return badge;
+    }
+
+    if (item.statusCode !== null && item.statusCode !== undefined && displayConfig.showStatusCode) {
+      const badge = document.createElement('span');
+      const statusClass = `status-${Math.floor(item.statusCode / 100)}xx`;
+      badge.className = `status-badge ${statusClass}`;
+      badge.textContent = String(item.statusCode);
+      return badge;
+    }
+
+    return null;
   }
 
   /**
@@ -368,13 +464,16 @@ export class HistoryManager {
     rerunBtn.className = CSS_CLASSES.HISTORY_RERUN_BTN;
     
     rerunBtn.addEventListener('click', async () => {
+      // ハンドラー側で実行中ガード・履歴再表示・トースト通知を行う
+      rerunBtn.disabled = true;
       try {
         await handler.executeWithHistory(item);
-        // 履歴を再表示（保存されているハンドラーを使用）
-        await HistoryManager.display(type, historyListId, null, this._handlers);
       } catch (e) {
         console.error('再実行に失敗しました:', e);
-        this._showButtonFeedback(rerunBtn, 'Error', '#dc3545');
+        this._showButtonFeedback(rerunBtn, 'Error', 'feedback-error');
+      } finally {
+        // 再表示でボタンごと破棄されるが、失敗時に残った場合に備えて復帰させる
+        rerunBtn.disabled = false;
       }
     });
     
@@ -399,13 +498,13 @@ export class HistoryManager {
         
         if (copyText) {
           await navigator.clipboard.writeText(copyText);
-          this._showButtonFeedback(copyBtn, 'Copied!', '#28a745');
+          this._showButtonFeedback(copyBtn, 'Copied!', 'feedback-success');
         } else {
-          this._showButtonFeedback(copyBtn, 'No data', '#999', 1000);
+          this._showButtonFeedback(copyBtn, 'No data', 'feedback-muted', 1000);
         }
       } catch (e) {
         console.error('コピーに失敗しました:', e);
-        this._showButtonFeedback(copyBtn, 'Error', '#dc3545');
+        this._showButtonFeedback(copyBtn, 'Error', 'feedback-error');
       }
     });
     
@@ -554,9 +653,35 @@ export class HistoryManager {
       await this.deleteByTimestamp(item.timestamp);
       // 保存されているハンドラーを使用して再表示
       await this.display(type, historyListId, null, this._handlers);
+
+      // 確認ダイアログの代わりに「元に戻す」付きトーストで安全性を担保する
+      showToast('履歴を削除しました', {
+        type: 'info',
+        actionLabel: '元に戻す',
+        onAction: async () => {
+          await this._restoreItem(item);
+          await this.display(type, historyListId, null, this._handlers);
+        }
+      });
     });
-    
+
     return deleteBtn;
+  }
+
+  /**
+   * 削除した履歴アイテムを復元（元に戻す）
+   * @private
+   * @param {Object} item - 復元する履歴アイテム
+   * @returns {Promise<void>}
+   */
+  static async _restoreItem(item) {
+    const items = await chrome.storage.local.get([STORAGE_KEYS.HISTORY]);
+    const history = items[STORAGE_KEYS.HISTORY] || [];
+    if (history.some(h => h.timestamp === item.timestamp)) return;
+    history.push(item);
+    // タイムスタンプ降順（新しい順）を維持する
+    history.sort((a, b) => (a.timestamp < b.timestamp ? 1 : -1));
+    await chrome.storage.local.set({ [STORAGE_KEYS.HISTORY]: history });
   }
 
   /**
@@ -564,16 +689,16 @@ export class HistoryManager {
    * @private
    * @param {HTMLButtonElement} button - ボタン要素
    * @param {string} text - 表示テキスト
-   * @param {string} color - 背景色
+   * @param {string} feedbackClass - フィードバック用CSSクラス（feedback-success | feedback-error | feedback-muted）
    * @param {number} duration - 表示時間（ミリ秒）
    */
-  static _showButtonFeedback(button, text, color, duration = TIMING.BUTTON_FEEDBACK_DISPLAY) {
+  static _showButtonFeedback(button, text, feedbackClass, duration = TIMING.BUTTON_FEEDBACK_DISPLAY) {
     const originalText = button.textContent;
     button.textContent = text;
-    button.style.backgroundColor = color;
+    button.classList.add(feedbackClass);
     setTimeout(() => {
       button.textContent = originalText;
-      button.style.backgroundColor = '';
+      button.classList.remove(feedbackClass);
     }, duration);
   }
 }

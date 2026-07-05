@@ -5,8 +5,8 @@
 
 'use strict';
 
-import { STORAGE_KEYS, HISTORY_CONFIG, AUTH_TYPES, KINTONE_DOMAIN_PATTERN, ERROR_MESSAGES } from './constants.js';
-import { encrypt, decrypt } from './crypto-manager.js';
+import { STORAGE_KEYS, HISTORY_CONFIG, AUTH_TYPES, ERROR_MESSAGES, CONFIG_DOM_IDS } from './constants.js';
+import { isKintoneUrl } from './domain-validator.js';
 
 /**
  * 設定管理クラス
@@ -33,36 +33,26 @@ export class ConfigManager {
   }
 
   /**
-   * 認証設定を取得
-   * @returns {Promise<Object>} 認証設定オブジェクト
+   * 認証設定を取得（フォーム入力から直接構築。認証情報は永続化しない）
+   *
+   * セキュリティ方針：パスワード / APIトークン等の認証情報はストレージに一切保存せず、
+   * 実行のたびにサイドパネルのフォームから読み取ってメモリ上でのみ受け渡す。
+   * @returns {Object} 認証設定オブジェクト
    */
-  static async getAuthConfig() {
-    const items = await chrome.storage.session.get([
-      STORAGE_KEYS.AUTH_TYPE,
-      STORAGE_KEYS.AUTH_USER,
-      STORAGE_KEYS.AUTH_PASS,
-      STORAGE_KEYS.AUTH_API_TOKEN,
-      STORAGE_KEYS.OAUTH_CLIENT_ID,
-      STORAGE_KEYS.OAUTH_CLIENT_SECRET
-    ]);
+  static getAuthConfig() {
+    const getVal = (id) => document.getElementById(id)?.value || '';
 
     // デフォルトはセッション認証（kintoneのCookieを使用）
-    const authType = items[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION;
+    const authType = getVal(CONFIG_DOM_IDS.AUTH_TYPE) || AUTH_TYPES.SESSION;
     const config = { authType };
 
     switch (authType) {
       case AUTH_TYPES.PASSWORD:
-        config.username = items[STORAGE_KEYS.AUTH_USER] ? await decrypt(items[STORAGE_KEYS.AUTH_USER]) : '';
-        config.password = items[STORAGE_KEYS.AUTH_PASS] ? await decrypt(items[STORAGE_KEYS.AUTH_PASS]) : '';
+        config.username = getVal(CONFIG_DOM_IDS.AUTH_USER);
+        config.password = getVal(CONFIG_DOM_IDS.AUTH_PASS);
         break;
       case AUTH_TYPES.TOKEN:
-        config.apiToken = items[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(items[STORAGE_KEYS.AUTH_API_TOKEN]) : '';
-        break;
-      case AUTH_TYPES.OAUTH:
-        config.clientId = items[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '';
-        config.clientSecret = items[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(items[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '';
-        // Note: OAuth認証は現在未実装。将来的にアクセストークン取得フローを追加予定
-        config.accessToken = '';
+        config.apiToken = getVal(CONFIG_DOM_IDS.AUTH_API_TOKEN);
         break;
       case AUTH_TYPES.SESSION:
         // セッション認証（Cookieを使用）は特別な設定不要
@@ -73,62 +63,27 @@ export class ConfigManager {
   }
 
   /**
-   * 認証設定を保存
-   * @param {Object} config - 認証設定オブジェクト
-   * @returns {Promise<void>}
-   */
-  static async saveAuthConfig(config) {
-    const encrypted = {
-      [STORAGE_KEYS.AUTH_TYPE]: config.authType
-    };
-
-    if (config.authUser) encrypted[STORAGE_KEYS.AUTH_USER] = await encrypt(config.authUser);
-    if (config.authPass) encrypted[STORAGE_KEYS.AUTH_PASS] = await encrypt(config.authPass);
-    if (config.authApiToken) encrypted[STORAGE_KEYS.AUTH_API_TOKEN] = await encrypt(config.authApiToken);
-    if (config.oauthClientId) encrypted[STORAGE_KEYS.OAUTH_CLIENT_ID] = await encrypt(config.oauthClientId);
-    if (config.oauthClientSecret) encrypted[STORAGE_KEYS.OAUTH_CLIENT_SECRET] = await encrypt(config.oauthClientSecret);
-
-    await chrome.storage.session.set(encrypted);
-  }
-
-  /**
-   * 全設定を読み込み
+   * 全設定を読み込み（認証情報は永続化しないため対象外）
    * @returns {Promise<Object>} 全設定オブジェクト
    */
   static async loadAllConfig() {
-    // 認証情報はsessionストレージから、その他はlocalストレージから並行取得
-    const [authItems, otherItems] = await Promise.all([
-      chrome.storage.session.get([
-        STORAGE_KEYS.AUTH_TYPE,
-        STORAGE_KEYS.AUTH_USER,
-        STORAGE_KEYS.AUTH_PASS,
-        STORAGE_KEYS.AUTH_API_TOKEN,
-        STORAGE_KEYS.OAUTH_CLIENT_ID,
-        STORAGE_KEYS.OAUTH_CLIENT_SECRET
-      ]),
-      chrome.storage.local.get([
-        STORAGE_KEYS.HISTORY_LIMIT,
-        STORAGE_KEYS.SHOW_REQUEST_HEADERS,
-        STORAGE_KEYS.SHOW_STATUS_CODE,
-        STORAGE_KEYS.SHOW_RESPONSE_HEADERS,
-        STORAGE_KEYS.SHOW_COPY_BUTTON,
-        STORAGE_KEYS.SHOW_RERUN_BUTTON,
-        STORAGE_KEYS.SHOW_DELETE_BUTTON,
-        STORAGE_KEYS.SHOW_EXECUTION_LOG,
-        STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
-        STORAGE_KEYS.COPY_INCLUDE_API_NAME,
-        STORAGE_KEYS.COPY_INCLUDE_URL
-      ])
+    const otherItems = await chrome.storage.local.get([
+      STORAGE_KEYS.HISTORY_LIMIT,
+      STORAGE_KEYS.SHOW_REQUEST_HEADERS,
+      STORAGE_KEYS.SHOW_STATUS_CODE,
+      STORAGE_KEYS.SHOW_RESPONSE_HEADERS,
+      STORAGE_KEYS.SHOW_COPY_BUTTON,
+      STORAGE_KEYS.SHOW_RERUN_BUTTON,
+      STORAGE_KEYS.SHOW_DELETE_BUTTON,
+      STORAGE_KEYS.SHOW_EXECUTION_LOG,
+      STORAGE_KEYS.COPY_INCLUDE_DISPLAY_NAME,
+      STORAGE_KEYS.COPY_INCLUDE_API_NAME,
+      STORAGE_KEYS.COPY_INCLUDE_URL
     ]);
 
     return {
       // デフォルトはセッション認証（kintoneのCookieを使用）
-      authType: authItems[STORAGE_KEYS.AUTH_TYPE] || AUTH_TYPES.SESSION,
-      authUser: authItems[STORAGE_KEYS.AUTH_USER] ? await decrypt(authItems[STORAGE_KEYS.AUTH_USER]) : '',
-      authPass: authItems[STORAGE_KEYS.AUTH_PASS] ? await decrypt(authItems[STORAGE_KEYS.AUTH_PASS]) : '',
-      authApiToken: authItems[STORAGE_KEYS.AUTH_API_TOKEN] ? await decrypt(authItems[STORAGE_KEYS.AUTH_API_TOKEN]) : '',
-      oauthClientId: authItems[STORAGE_KEYS.OAUTH_CLIENT_ID] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_ID]) : '',
-      oauthClientSecret: authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET] ? await decrypt(authItems[STORAGE_KEYS.OAUTH_CLIENT_SECRET]) : '',
+      authType: AUTH_TYPES.SESSION,
       historyLimit: Math.min(
         Math.max(HISTORY_CONFIG.MIN_LIMIT, otherItems[STORAGE_KEYS.HISTORY_LIMIT] ?? HISTORY_CONFIG.DEFAULT_LIMIT),
         HISTORY_CONFIG.MAX_LIMIT
@@ -255,29 +210,6 @@ export class ConfigManager {
   }
 
   /**
-   * 認証情報をクリア（ログアウト）
-   * @returns {Promise<void>}
-   */
-  static async clearAuthCredentials() {
-    await chrome.storage.session.remove([
-      STORAGE_KEYS.AUTH_TYPE,
-      STORAGE_KEYS.AUTH_USER,
-      STORAGE_KEYS.AUTH_PASS,
-      STORAGE_KEYS.AUTH_API_TOKEN,
-      STORAGE_KEYS.OAUTH_CLIENT_ID,
-      STORAGE_KEYS.OAUTH_CLIENT_SECRET
-    ]);
-  }
-
-  /**
-   * OAuth用のリダイレクトURIを取得
-   * @returns {string} リダイレクトURI
-   */
-  static getOAuthRedirectUri() {
-    return chrome.identity ? chrome.identity.getRedirectURL() : 'https://<ExtensionID>.chromiumapp.org/';
-  }
-
-  /**
    * 保存されたkintoneタブIDを取得
    * @returns {Promise<number|null>} タブID（保存されていない場合はnull）
    */
@@ -329,9 +261,9 @@ export class ConfigManager {
   static async getKintoneTabIdForExecution() {
     // まずアクティブタブを確認（優先）
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (activeTab && activeTab.url && activeTab.url.includes(KINTONE_DOMAIN_PATTERN)) {
-      // アクティブタブがcybozu.comの場合は優先して使用
+
+    if (activeTab && isKintoneUrl(activeTab.url)) {
+      // アクティブタブがkintoneドメインの場合は優先して使用
       // 自動で保存（記憶を更新）
       const tabInfo = {
         title: activeTab.title || '',
@@ -340,21 +272,25 @@ export class ConfigManager {
       await ConfigManager.saveKintoneTab(activeTab.id, tabInfo);
       return activeTab.id;
     }
-    
-    // アクティブタブがcybozu.comでない場合、保存されたタブIDを使用
+
+    // アクティブタブがkintoneでない場合、保存されたタブIDを使用
     const savedTabId = await ConfigManager.getKintoneTabId();
-    
+
     if (savedTabId) {
-      // 保存されたタブIDがある場合、タブが存在するか確認
+      // 保存されたタブIDがある場合、タブが存在し、かつ現在も kintone ドメインかを確認
+      // （記憶後に別サイトへ遷移している可能性があるため URL を再検証する）
+      let tab;
       try {
-        await chrome.tabs.get(savedTabId);
-        return savedTabId;
+        tab = await chrome.tabs.get(savedTabId);
       } catch (e) {
-        // タブが存在しない場合はエラー
         throw new Error(ERROR_MESSAGES.KINTONE_TAB_NOT_FOUND);
       }
+      if (!isKintoneUrl(tab.url)) {
+        throw new Error(ERROR_MESSAGES.INVALID_KINTONE_DOMAIN);
+      }
+      return savedTabId;
     }
-    
+
     // 保存されたタブIDもない場合はエラー
     throw new Error(ERROR_MESSAGES.KINTONE_TAB_NOT_FOUND);
   }
@@ -367,12 +303,11 @@ export class ConfigManager {
   static async getKintoneDomainForExecution() {
     // まずアクティブタブを確認（優先）
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    
-    if (activeTab && activeTab.url && activeTab.url.includes(KINTONE_DOMAIN_PATTERN)) {
-      // アクティブタブがcybozu.comの場合は優先して使用
-      const urlObj = new URL(activeTab.url);
-      const domain = urlObj.hostname;
-      
+
+    if (activeTab && isKintoneUrl(activeTab.url)) {
+      // アクティブタブがkintoneドメインの場合は優先して使用
+      const domain = new URL(activeTab.url).hostname;
+
       // 自動で保存（記憶を更新）
       const tabInfo = {
         title: activeTab.title || '',
@@ -381,24 +316,25 @@ export class ConfigManager {
       await ConfigManager.saveKintoneTab(activeTab.id, tabInfo);
       return domain;
     }
-    
-    // アクティブタブがcybozu.comでない場合、保存されたタブIDを使用
+
+    // アクティブタブがkintoneでない場合、保存されたタブIDを使用
     const savedTabId = await ConfigManager.getKintoneTabId();
-    
+
     if (savedTabId) {
-      // 保存されたタブIDがある場合、タブが存在するか確認
+      // 保存されたタブIDがある場合、タブが存在し、かつ現在も kintone ドメインかを確認
+      // （記憶後に別サイトへ遷移している可能性があるため URL を再検証する）
+      let tab;
       try {
-        const tab = await chrome.tabs.get(savedTabId);
-        if (tab && tab.url) {
-          const urlObj = new URL(tab.url);
-          return urlObj.hostname;
-        }
+        tab = await chrome.tabs.get(savedTabId);
       } catch (e) {
-        // タブが存在しない場合はエラー
         throw new Error(ERROR_MESSAGES.KINTONE_TAB_NOT_FOUND);
       }
+      if (!isKintoneUrl(tab.url)) {
+        throw new Error(ERROR_MESSAGES.INVALID_KINTONE_DOMAIN);
+      }
+      return new URL(tab.url).hostname;
     }
-    
+
     // 保存されたタブIDもない場合はエラー
     throw new Error(ERROR_MESSAGES.KINTONE_TAB_NOT_FOUND);
   }

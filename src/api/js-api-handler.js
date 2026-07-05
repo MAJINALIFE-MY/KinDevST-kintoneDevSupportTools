@@ -9,6 +9,8 @@ import { JS_DOM_IDS, API_TYPES, CSS_CLASSES } from '../utils/constants.js';
 import { parseArgValue } from '../utils/arg-formatter.js';
 import { HistoryManager } from '../utils/history-manager.js';
 import { ConfigManager } from '../utils/config-manager.js';
+import { setButtonLoading } from '../ui/ui-helpers.js';
+import { showToast } from '../ui/toast.js';
 
 /**
  * JS API実行ハンドラークラス
@@ -24,6 +26,7 @@ export class JsApiHandler {
     this.definitionManager = options.definitionManager;
     this.executor = options.executor;
     this.selector = options.selector;
+    this._isExecuting = false;
   }
 
   /**
@@ -58,11 +61,14 @@ export class JsApiHandler {
    * @param {string|null} apiName - API名（省略時はセレクターから取得）
    */
   async execute(args = null, apiName = null) {
+    if (this._isExecuting) return;
+
     if (!apiName) {
       apiName = this.selector.getSelectedApiName();
     }
-    
+
     if (!apiName) {
+      showToast('APIを選択してください', { type: 'info' });
       return;
     }
 
@@ -127,8 +133,11 @@ export class JsApiHandler {
       }
     }
     
+    const execBtn = document.getElementById(JS_DOM_IDS.EXEC_BTN);
+    this._isExecuting = true;
+    setButtonLoading(execBtn, true);
+
     try {
-      
       // kintoneタブIDを取得（アクティブタブ優先、後方互換性のため失敗時はnullを返す）
       let tabId = null;
       try {
@@ -137,24 +146,35 @@ export class JsApiHandler {
         // タブが見つからない場合は従来通りアクティブタブを使用（後方互換性）
         tabId = null;
       }
-      
+
       // 実行
-      const result = tabId 
+      const result = tabId
         ? await this.executor.execute(apiName, args, tabId)
         : await this.executor.executeInActiveTab(apiName, args);
-      
-      // 履歴に保存
+
+      // 履歴に保存して再表示
       await HistoryManager.save(API_TYPES.JS, apiName, args, result);
-      
-      // 履歴を再表示（ハンドラーを渡す）
-      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: null, js: this });
-      
+      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST);
+      this._scrollToLatest();
+      showToast('実行しました', { type: 'success' });
     } catch (e) {
-      // エラーも履歴に保存
+      // エラーも履歴に保存して再表示
       await HistoryManager.save(API_TYPES.JS, apiName, args, null, e);
-      
-      // 履歴を再表示（ハンドラーを渡す）
-      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: null, js: this });
+      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST);
+      this._scrollToLatest();
+      showToast(`エラー: ${e.message}`, { type: 'error' });
+    } finally {
+      this._isExecuting = false;
+      setButtonLoading(execBtn, false);
     }
+  }
+
+  /**
+   * 最新の実行結果までスクロール
+   * @private
+   */
+  _scrollToLatest() {
+    const historyList = document.getElementById(JS_DOM_IDS.HISTORY_LIST);
+    historyList?.firstElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }

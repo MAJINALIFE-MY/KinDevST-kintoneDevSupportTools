@@ -10,9 +10,8 @@ import { JSAPIDefinitionManager } from './js-api/js-api-definitions.js';
 import { matchesScreenFilter } from './js-api/js-api-availability.js';
 import { JSAPIExecutor } from './js-api/js-api-executor.js';
 import { RESTAPIDefinitionManager } from './rest-api/rest-api-definitions.js';
-import { RESTAPIExecutor } from './rest-api/rest-api-executor.js';
 import { UserAPIDefinitionManager } from './user-api/user-api-definitions.js';
-import { UserAPIExecutor } from './user-api/user-api-executor.js';
+import { RestLikeExecutor } from './utils/rest-like-executor.js';
 
 // ユーティリティモジュール
 import {
@@ -23,12 +22,11 @@ import {
   CONFIG_DOM_IDS,
   HISTORY_CONFIG,
   TIMING,
-  KINTONE_DOMAIN_PATTERN,
   ERROR_MESSAGES,
   CSS_CLASSES,
-  STORAGE_KEYS,
-  AUTH_TYPES
+  STORAGE_KEYS
 } from './utils/constants.js';
+import { isKintoneUrl } from './utils/domain-validator.js';
 import { ConfigManager } from './utils/config-manager.js';
 import { HistoryManager } from './utils/history-manager.js';
 
@@ -36,11 +34,12 @@ import { HistoryManager } from './utils/history-manager.js';
 import { ApiSelector, waitForJQuery } from './ui/api-selector.js';
 import { TabManager, AuthSectionManager } from './ui/tab-manager.js';
 import { RestApiDisplay, JsApiDisplay } from './ui/api-display.js';
+import { showEmptyState } from './ui/ui-helpers.js';
+import { showToast } from './ui/toast.js';
 
 // API実行ハンドラー
-import { RestApiHandler } from './api/rest-api-handler.js';
+import { BodyApiHandler } from './api/body-api-handler.js';
 import { JsApiHandler } from './api/js-api-handler.js';
-import { UserApiHandler } from './api/user-api-handler.js';
 
 // ===== グローバルインスタンス =====
 
@@ -48,9 +47,9 @@ import { UserApiHandler } from './api/user-api-handler.js';
 const jsApiDefinitionManager = new JSAPIDefinitionManager();
 const jsApiExecutor = new JSAPIExecutor(jsApiDefinitionManager);
 const restApiDefinitionManager = new RESTAPIDefinitionManager();
-const restApiExecutor = new RESTAPIExecutor(restApiDefinitionManager);
+const restApiExecutor = new RestLikeExecutor(restApiDefinitionManager);
 const userApiDefinitionManager = new UserAPIDefinitionManager();
-const userApiExecutor = new UserAPIExecutor(userApiDefinitionManager);
+const userApiExecutor = new RestLikeExecutor(userApiDefinitionManager);
 
 // UIコンポーネント
 let tabManager;
@@ -75,30 +74,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tabId === API_TYPES.REST) {
         const restHistory = await HistoryManager.getByType(API_TYPES.REST);
         if (restHistory.length > 0 && restApiHandler && jsApiHandler) {
-          await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+          await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST);
         }
       } else if (tabId === API_TYPES.JS) {
         const jsHistory = await HistoryManager.getByType(API_TYPES.JS);
         if (jsHistory.length > 0 && restApiHandler && jsApiHandler) {
-          await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+          await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST);
         }
       } else if (tabId === API_TYPES.USER) {
         const userHistory = await HistoryManager.getByType(API_TYPES.USER);
         if (userHistory.length > 0 && userApiHandler) {
-          await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+          await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST);
         }
       }
     }
   });
   tabManager.setupTabs();
-  
+
   // 認証セクション管理の初期化
   authSectionManager = new AuthSectionManager(CONFIG_DOM_IDS.AUTH_TYPE);
   authSectionManager.setup();
-  
+
   // jQueryの読み込みを待つ
   await waitForJQuery();
-  
+
   // JSON定義の読み込み
   await jsApiDefinitionManager.loadDefinitions('./js-api/js-api-definitions.json');
   await restApiDefinitionManager.loadDefinitions('./rest-api/rest-api-definitions.json');
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     bodyInputId: REST_DOM_IDS.BODY,
     historyListId: REST_DOM_IDS.HISTORY_LIST
   });
-  
+
   // JS API表示管理の初期化
   jsApiDisplay = new JsApiDisplay({
     definitionManager: jsApiDefinitionManager,
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     argsContainerId: JS_DOM_IDS.ARGS_CONTAINER,
     historyListId: JS_DOM_IDS.HISTORY_LIST
   });
-  
+
   // REST APIセレクターの初期化
   restApiSelector = new ApiSelector({
     displaySelectorId: REST_DOM_IDS.SELECTOR_DISPLAY,
@@ -131,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     showDuplicateFlag: false
   });
   restApiSelector.initialize();
-  
+
   // JS APIセレクターの初期化
   jsApiSelector = new ApiSelector({
     displaySelectorId: JS_DOM_IDS.SELECTOR_DISPLAY,
@@ -170,13 +169,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   userApiSelector.initialize();
 
   // REST API実行ハンドラーの初期化
-  restApiHandler = new RestApiHandler({
+  restApiHandler = new BodyApiHandler({
     definitionManager: restApiDefinitionManager,
     executor: restApiExecutor,
-    selector: restApiSelector
+    selector: restApiSelector,
+    domIds: REST_DOM_IDS,
+    apiType: API_TYPES.REST
   });
   restApiHandler.setupExecuteButton();
-  
+
   // JS API実行ハンドラーの初期化
   jsApiHandler = new JsApiHandler({
     definitionManager: jsApiDefinitionManager,
@@ -186,60 +187,58 @@ document.addEventListener('DOMContentLoaded', async () => {
   jsApiHandler.setupExecuteButton();
 
   // User API実行ハンドラーの初期化
-  userApiHandler = new UserApiHandler({
+  userApiHandler = new BodyApiHandler({
     definitionManager: userApiDefinitionManager,
     executor: userApiExecutor,
-    selector: userApiSelector
+    selector: userApiSelector,
+    domIds: USER_DOM_IDS,
+    apiType: API_TYPES.USER
   });
   userApiHandler.setupExecuteButton();
 
-  // コピーボタンのセットアップ（実行結果表示エリアを削除したため、コピーボタンも不要）
-  
-  // 設定保存ボタンのセットアップ
-  setupConfigSaveButtons();
+  // 再実行用ハンドラー束を一度だけ登録（以降の display は handlers 省略可）
+  HistoryManager.setHandlers({ rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+
+  // 設定の自動保存のセットアップ
+  setupConfigAutoSave();
 
   // API名コピーボタンのセットアップ
   setupApiNameCopyButtons();
-  
+
   // タブ記憶機能のセットアップ
   setupTabMemory();
   setupTabInfoAutoUpdate();
   await displayTabInfo();
-  
+
+  // 「Settingを開く」等のタブ遷移リンクのセットアップ
+  setupTabNavigationLinks();
+
+  // 実行先未設定バナーのセットアップ
+  setupExecutionTargetBanner();
+
   // 初期表示時の認証セクション更新
   const initialAuthType = document.getElementById(CONFIG_DOM_IDS.AUTH_TYPE)?.value;
   if (initialAuthType) {
     authSectionManager.updateSection(initialAuthType);
   }
-  
+
   // 設定の読み込み
   await loadConfig();
-  
-  // OAuthリダイレクトURIを表示
-  const redirectInput = document.getElementById(CONFIG_DOM_IDS.OAUTH_REDIRECT_URI);
-  if (redirectInput) {
-    redirectInput.value = ConfigManager.getOAuthRedirectUri();
-  }
-  
-  // 履歴を初期表示（履歴がない場合は初期メッセージが表示される）
-  const restHistory = await HistoryManager.getByType(API_TYPES.REST);
-  const jsHistory = await HistoryManager.getByType(API_TYPES.JS);
-  const userHistory = await HistoryManager.getByType(API_TYPES.USER);
 
-  if (restHistory.length > 0) {
-    await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
+  // 履歴を初期表示（履歴がない場合は初回ガイドを表示）
+  const initialTargets = [
+    [API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST],
+    [API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST],
+    [API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST]
+  ];
+  for (const [type, historyListId] of initialTargets) {
+    const history = await HistoryManager.getByType(type);
+    if (history.length > 0) {
+      await HistoryManager.display(type, historyListId);
+    } else {
+      showEmptyState(historyListId);
+    }
   }
-
-  if (jsHistory.length > 0) {
-    await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
-  }
-
-  if (userHistory.length > 0) {
-    await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
-  }
-  
-  // オートロック通知の受信処理
-  setupAutoLockListener();
 });
 
 // ===== 設定管理 =====
@@ -249,32 +248,16 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 async function loadConfig() {
   const config = await ConfigManager.loadAllConfig();
-  
-  // 認証方式の復元
+
+  // 認証方式の復元（認証情報は永続化しないため、方式のみデフォルト＝セッションに戻す）
   authSectionManager.setAuthType(config.authType);
-  
-  // パスワード認証設定
-  const authUserInput = document.getElementById(CONFIG_DOM_IDS.AUTH_USER);
-  const authPassInput = document.getElementById(CONFIG_DOM_IDS.AUTH_PASS);
-  if (authUserInput) authUserInput.value = config.authUser;
-  if (authPassInput) authPassInput.value = config.authPass;
-  
-  // APIトークン設定
-  const authApiTokenInput = document.getElementById(CONFIG_DOM_IDS.AUTH_API_TOKEN);
-  if (authApiTokenInput) authApiTokenInput.value = config.authApiToken;
-  
-  // OAuth設定
-  const oauthClientIdInput = document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_ID);
-  const oauthClientSecretInput = document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_SECRET);
-  if (oauthClientIdInput) oauthClientIdInput.value = config.oauthClientId;
-  if (oauthClientSecretInput) oauthClientSecretInput.value = config.oauthClientSecret;
-  
+
   // 履歴保存数の設定
   const historyLimitInput = document.getElementById(CONFIG_DOM_IDS.HISTORY_LIMIT);
   if (historyLimitInput) {
     historyLimitInput.value = config.historyLimit;
   }
-  
+
   // REST API表示設定
   const showRequestHeadersInput = document.getElementById(CONFIG_DOM_IDS.SHOW_REQUEST_HEADERS);
   const showStatusCodeInput = document.getElementById(CONFIG_DOM_IDS.SHOW_STATUS_CODE);
@@ -282,7 +265,7 @@ async function loadConfig() {
   if (showRequestHeadersInput) showRequestHeadersInput.checked = config.showRequestHeaders;
   if (showStatusCodeInput) showStatusCodeInput.checked = config.showStatusCode;
   if (showResponseHeadersInput) showResponseHeadersInput.checked = config.showResponseHeaders;
-  
+
   // ボタン表示設定
   const showCopyButtonInput = document.getElementById(CONFIG_DOM_IDS.SHOW_COPY_BUTTON);
   const showRerunButtonInput = document.getElementById(CONFIG_DOM_IDS.SHOW_RERUN_BUTTON);
@@ -290,7 +273,7 @@ async function loadConfig() {
   if (showCopyButtonInput) showCopyButtonInput.checked = config.showCopyButton;
   if (showRerunButtonInput) showRerunButtonInput.checked = config.showRerunButton;
   if (showDeleteButtonInput) showDeleteButtonInput.checked = config.showDeleteButton;
-  
+
   // 実行ログ設定
   const showExecutionLogInput = document.getElementById(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG);
   if (showExecutionLogInput) showExecutionLogInput.checked = config.showExecutionLog;
@@ -305,65 +288,104 @@ async function loadConfig() {
 }
 
 /**
- * 設定保存ボタンをセットアップ
+ * 履歴がある種別のみ履歴表示を更新する
+ * （履歴ゼロの種別は初回ガイド/初期メッセージを維持するため再描画しない）
  */
-function setupConfigSaveButtons() {
-  // 設定保存ボタン（認証設定 + 表示設定 + 履歴設定）
-  const saveConfigBtn = document.getElementById(CONFIG_DOM_IDS.SAVE_CONFIG_BTN);
-  if (saveConfigBtn) {
-    saveConfigBtn.addEventListener('click', async () => {
-      // 認証設定
-      const authConfig = {
-        authType: document.getElementById(CONFIG_DOM_IDS.AUTH_TYPE)?.value,
-        authUser: document.getElementById(CONFIG_DOM_IDS.AUTH_USER)?.value,
-        authPass: document.getElementById(CONFIG_DOM_IDS.AUTH_PASS)?.value,
-        authApiToken: document.getElementById(CONFIG_DOM_IDS.AUTH_API_TOKEN)?.value,
-        oauthClientId: document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_ID)?.value,
-        oauthClientSecret: document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_SECRET)?.value
-      };
-      
-      // 表示設定
-      const displayConfig = {
-        showRequestHeaders: document.getElementById(CONFIG_DOM_IDS.SHOW_REQUEST_HEADERS)?.checked ?? true,
-        showStatusCode: document.getElementById(CONFIG_DOM_IDS.SHOW_STATUS_CODE)?.checked ?? true,
-        showResponseHeaders: document.getElementById(CONFIG_DOM_IDS.SHOW_RESPONSE_HEADERS)?.checked ?? true
-      };
-      
-      // ボタン表示設定
-      const buttonDisplayConfig = {
-        showCopyButton: document.getElementById(CONFIG_DOM_IDS.SHOW_COPY_BUTTON)?.checked ?? true,
-        showRerunButton: document.getElementById(CONFIG_DOM_IDS.SHOW_RERUN_BUTTON)?.checked ?? true,
-        showDeleteButton: document.getElementById(CONFIG_DOM_IDS.SHOW_DELETE_BUTTON)?.checked ?? true
-      };
-      
-      // 実行ログ設定
-      const showExecutionLog = document.getElementById(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG)?.checked ?? false;
+async function refreshHistories() {
+  const targets = [
+    [API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST],
+    [API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST],
+    [API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST]
+  ];
+  for (const [type, historyListId] of targets) {
+    const history = await HistoryManager.getByType(type);
+    if (history.length > 0) {
+      await HistoryManager.display(type, historyListId);
+    }
+  }
+}
 
-      // API名コピー形式設定
-      const copyFormatConfig = {
-        copyIncludeDisplayName: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_DISPLAY_NAME)?.checked ?? true,
-        copyIncludeApiName: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_API_NAME)?.checked ?? true,
-        copyIncludeUrl: document.getElementById(CONFIG_DOM_IDS.COPY_INCLUDE_URL)?.checked ?? true
-      };
-      
-      // 履歴設定
-      const historyLimitInput = document.getElementById(CONFIG_DOM_IDS.HISTORY_LIMIT);
-      const historyLimit = parseInt(historyLimitInput?.value) || HISTORY_CONFIG.DEFAULT_LIMIT;
-      
-      await ConfigManager.saveAuthConfig(authConfig);
-      await ConfigManager.saveRestApiDisplayConfig(displayConfig);
-      await ConfigManager.saveButtonDisplayConfig(buttonDisplayConfig);
-      await ConfigManager.saveExecutionLogEnabled(showExecutionLog);
-      await ConfigManager.saveCopyFormatConfig(copyFormatConfig);
-      await ConfigManager.setHistoryLimit(historyLimit);
-      await HistoryManager.trimToLimit();
-      
-      // 履歴を再表示して設定を反映
-      await HistoryManager.display(API_TYPES.REST, REST_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
-      await HistoryManager.display(API_TYPES.JS, JS_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
-      await HistoryManager.display(API_TYPES.USER, USER_DOM_IDS.HISTORY_LIST, null, { rest: restApiHandler, js: jsApiHandler, user: userApiHandler });
-      
-      showSaveMessage(CONFIG_DOM_IDS.CONFIG_MESSAGE);
+/**
+ * 設定の自動保存をセットアップ
+ * 保存ボタンは廃止し、各設定の変更時に即時保存する（押し忘れ事故の防止）。
+ * 認証情報（パスワード / APIトークン等）は従来通り永続化しない。
+ */
+function setupConfigAutoSave() {
+  const notifySaved = () => showToast('設定を保存しました', { type: 'success' });
+  const addChangeListener = (id, handler) => document.getElementById(id)?.addEventListener('change', handler);
+  const isChecked = (id, fallback = true) => document.getElementById(id)?.checked ?? fallback;
+
+  // REST API表示設定（履歴表示に影響するため再描画する）
+  const saveRestDisplayConfig = async () => {
+    await ConfigManager.saveRestApiDisplayConfig({
+      showRequestHeaders: isChecked(CONFIG_DOM_IDS.SHOW_REQUEST_HEADERS),
+      showStatusCode: isChecked(CONFIG_DOM_IDS.SHOW_STATUS_CODE),
+      showResponseHeaders: isChecked(CONFIG_DOM_IDS.SHOW_RESPONSE_HEADERS)
+    });
+    await refreshHistories();
+    notifySaved();
+  };
+  [
+    CONFIG_DOM_IDS.SHOW_REQUEST_HEADERS,
+    CONFIG_DOM_IDS.SHOW_STATUS_CODE,
+    CONFIG_DOM_IDS.SHOW_RESPONSE_HEADERS
+  ].forEach((id) => addChangeListener(id, saveRestDisplayConfig));
+
+  // ボタン表示設定（履歴表示に影響するため再描画する）
+  const saveButtonDisplayConfig = async () => {
+    await ConfigManager.saveButtonDisplayConfig({
+      showCopyButton: isChecked(CONFIG_DOM_IDS.SHOW_COPY_BUTTON),
+      showRerunButton: isChecked(CONFIG_DOM_IDS.SHOW_RERUN_BUTTON),
+      showDeleteButton: isChecked(CONFIG_DOM_IDS.SHOW_DELETE_BUTTON)
+    });
+    await refreshHistories();
+    notifySaved();
+  };
+  [
+    CONFIG_DOM_IDS.SHOW_COPY_BUTTON,
+    CONFIG_DOM_IDS.SHOW_RERUN_BUTTON,
+    CONFIG_DOM_IDS.SHOW_DELETE_BUTTON
+  ].forEach((id) => addChangeListener(id, saveButtonDisplayConfig));
+
+  // API名コピー形式設定
+  const saveCopyFormatConfig = async () => {
+    await ConfigManager.saveCopyFormatConfig({
+      copyIncludeDisplayName: isChecked(CONFIG_DOM_IDS.COPY_INCLUDE_DISPLAY_NAME),
+      copyIncludeApiName: isChecked(CONFIG_DOM_IDS.COPY_INCLUDE_API_NAME),
+      copyIncludeUrl: isChecked(CONFIG_DOM_IDS.COPY_INCLUDE_URL)
+    });
+    notifySaved();
+  };
+  [
+    CONFIG_DOM_IDS.COPY_INCLUDE_DISPLAY_NAME,
+    CONFIG_DOM_IDS.COPY_INCLUDE_API_NAME,
+    CONFIG_DOM_IDS.COPY_INCLUDE_URL
+  ].forEach((id) => addChangeListener(id, saveCopyFormatConfig));
+
+  // 実行ログ設定
+  addChangeListener(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG, async () => {
+    await ConfigManager.saveExecutionLogEnabled(isChecked(CONFIG_DOM_IDS.SHOW_EXECUTION_LOG, false));
+    notifySaved();
+  });
+
+  // 履歴保存数（デバウンス + 範囲クランプ）
+  const historyLimitInput = document.getElementById(CONFIG_DOM_IDS.HISTORY_LIMIT);
+  if (historyLimitInput) {
+    let debounceTimer;
+    historyLimitInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const value = parseInt(historyLimitInput.value);
+        if (isNaN(value)) return;
+        const clamped = Math.min(Math.max(HISTORY_CONFIG.MIN_LIMIT, value), HISTORY_CONFIG.MAX_LIMIT);
+        if (clamped !== value) {
+          historyLimitInput.value = clamped;
+        }
+        await ConfigManager.setHistoryLimit(clamped);
+        await HistoryManager.trimToLimit();
+        await refreshHistories();
+        notifySaved();
+      }, TIMING.INPUT_DEBOUNCE);
     });
   }
 }
@@ -431,79 +453,71 @@ function setupJsApiFilter() {
   platformRadios.forEach(r => r.addEventListener('change', onFilterChange));
 }
 
-/**
- * 保存完了メッセージを表示
- * @param {string} messageElementId - メッセージ要素のID
- */
-function showSaveMessage(messageElementId) {
-  const message = document.getElementById(messageElementId);
-  if (message) {
-    message.style.display = 'block';
-    setTimeout(() => {
-      message.style.display = 'none';
-    }, TIMING.SAVE_MESSAGE_DISPLAY);
-  }
-}
+// ===== タブ遷移リンク =====
 
 /**
- * エラーメッセージを表示
- * @param {string} messageElementId - メッセージ要素のID
- * @param {string} errorMessage - エラーメッセージ
+ * data-open-tab 属性を持つボタンでタブを切り替えられるようにする
+ * （実行先未設定バナーや初回ガイドの「Settingを開く」で使用。動的生成要素にも効くよう委譲で登録）
  */
-function showErrorMessage(messageElementId, errorMessage) {
-  const message = document.getElementById(messageElementId);
-  if (message) {
-    message.textContent = errorMessage;
-    message.style.display = 'block';
-    message.style.color = '#d32f2f';
-    setTimeout(() => {
-      message.style.display = 'none';
-      message.style.color = '';
-    }, TIMING.SAVE_MESSAGE_DISPLAY);
-  }
-}
-
-// ===== オートロック機能 =====
-
-/**
- * オートロック通知のリスナーをセットアップ
- */
-function setupAutoLockListener() {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.type === 'EVENT_LOGOUT') {
-      handleAutoLock();
+function setupTabNavigationLinks() {
+  document.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-open-tab]');
+    if (trigger && tabManager) {
+      tabManager.setActiveTab(trigger.dataset.openTab);
     }
   });
 }
 
+// ===== 実行先未設定バナー =====
+
 /**
- * オートロック処理
+ * API実行先（kintoneタブ）が解決できるかを判定
+ * ConfigManager.getKintoneDomainForExecution と同じ優先順位で、副作用なしに確認する。
+ * @returns {Promise<boolean>}
  */
-async function handleAutoLock() {
-  // 認証情報入力欄をクリア
-  const authUserInput = document.getElementById(CONFIG_DOM_IDS.AUTH_USER);
-  const authPassInput = document.getElementById(CONFIG_DOM_IDS.AUTH_PASS);
-  const authApiTokenInput = document.getElementById(CONFIG_DOM_IDS.AUTH_API_TOKEN);
-  const oauthClientIdInput = document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_ID);
-  const oauthClientSecretInput = document.getElementById(CONFIG_DOM_IDS.OAUTH_CLIENT_SECRET);
-  
-  if (authUserInput) authUserInput.value = '';
-  if (authPassInput) authPassInput.value = '';
-  if (authApiTokenInput) authApiTokenInput.value = '';
-  if (oauthClientIdInput) oauthClientIdInput.value = '';
-  if (oauthClientSecretInput) oauthClientSecretInput.value = '';
-  
-  // 認証方式をセッション認証にリセット
-  const authTypeSelect = document.getElementById(CONFIG_DOM_IDS.AUTH_TYPE);
-  if (authTypeSelect) {
-    authTypeSelect.value = AUTH_TYPES.SESSION;
-    if (authSectionManager) {
-      authSectionManager.updateSection(AUTH_TYPES.SESSION);
-    }
+async function isExecutionTargetAvailable() {
+  try {
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (activeTab && isKintoneUrl(activeTab.url)) return true;
+
+    const savedTabId = await ConfigManager.getKintoneTabId();
+    if (!savedTabId) return false;
+
+    const tab = await chrome.tabs.get(savedTabId);
+    return isKintoneUrl(tab.url);
+  } catch (e) {
+    return false;
   }
-  
-  // ユーザーに通知
-  showErrorMessage(CONFIG_DOM_IDS.CONFIG_MESSAGE, '一定時間操作がなかったため、セキュリティ保護のためログアウトしました。');
+}
+
+/**
+ * 実行先未設定バナーの表示/非表示を更新
+ */
+async function updateExecutionTargetBanners() {
+  const available = await isExecutionTargetAvailable();
+  document.querySelectorAll('.info-banner[data-banner="kintone-tab"]').forEach((banner) => {
+    banner.classList.toggle(CSS_CLASSES.HIDDEN, available);
+  });
+}
+
+/**
+ * 実行先未設定バナーをセットアップ
+ * アクティブタブの切り替え・URL変更・タブ記憶の変更に追従して自動更新する。
+ */
+function setupExecutionTargetBanner() {
+  updateExecutionTargetBanners();
+
+  chrome.tabs.onActivated.addListener(() => updateExecutionTargetBanners());
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status === 'complete' || changeInfo.url) {
+      updateExecutionTargetBanners();
+    }
+  });
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes[STORAGE_KEYS.KINTONE_TAB_ID]) {
+      updateExecutionTargetBanners();
+    }
+  });
 }
 
 // ===== タブ記憶機能 =====
@@ -514,36 +528,35 @@ async function handleAutoLock() {
 function setupTabMemory() {
   const saveTabBtn = document.getElementById(CONFIG_DOM_IDS.SAVE_TAB_BTN);
   if (!saveTabBtn) return;
-  
+
   saveTabBtn.addEventListener('click', async () => {
     try {
       // 現在アクティブなタブを取得
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab || !tab.url) {
-        showErrorMessage(CONFIG_DOM_IDS.TAB_MESSAGE, ERROR_MESSAGES.NO_ACTIVE_TAB);
+        showToast(ERROR_MESSAGES.NO_ACTIVE_TAB, { type: 'error' });
         return;
       }
-      
-      // cybozu.comかチェック
-      if (!tab.url.includes(KINTONE_DOMAIN_PATTERN)) {
-        showErrorMessage(CONFIG_DOM_IDS.TAB_MESSAGE, ERROR_MESSAGES.NOT_KINTONE_TAB);
+
+      // kintoneドメインかチェック（ラベル境界で *.cybozu.com に厳密一致）
+      if (!isKintoneUrl(tab.url)) {
+        showToast(ERROR_MESSAGES.NOT_KINTONE_TAB, { type: 'error' });
         return;
       }
-      
+
       // タブ情報を保存
       const tabInfo = {
         title: tab.title || '',
         url: tab.url || ''
       };
       await ConfigManager.saveKintoneTab(tab.id, tabInfo);
-      
+
       // 表示を更新
       await displayTabInfo();
-      
-      // 成功メッセージを表示
-      showSaveMessage(CONFIG_DOM_IDS.TAB_MESSAGE);
+
+      showToast('タブを記憶しました', { type: 'success' });
     } catch (e) {
-      showErrorMessage(CONFIG_DOM_IDS.TAB_MESSAGE, e.message);
+      showToast(e.message, { type: 'error' });
     }
   });
 }
@@ -554,36 +567,31 @@ function setupTabMemory() {
 async function displayTabInfo() {
   const tabInfoDisplay = document.getElementById(CONFIG_DOM_IDS.TAB_INFO_DISPLAY);
   if (!tabInfoDisplay) return;
-  
+
   const tabId = await ConfigManager.getKintoneTabId();
   const tabInfo = await ConfigManager.getKintoneTabInfo();
-  
+
   if (!tabId || !tabInfo) {
     tabInfoDisplay.classList.remove('active');
     tabInfoDisplay.classList.add(CSS_CLASSES.HIDDEN);
     return;
   }
-  
+
   // タブが存在するか確認
   try {
     const tab = await chrome.tabs.get(tabId);
     if (tab) {
-      // タブ情報を表示
+      // タブ情報を表示（スタイルは .tab-info-title / .tab-info-url のCSSで適用）
       const titleElement = tabInfoDisplay.querySelector('.tab-info-title');
       const urlElement = tabInfoDisplay.querySelector('.tab-info-url');
-      
+
       if (titleElement) {
         titleElement.textContent = tabInfo.title || 'タイトルなし';
-        titleElement.style.fontWeight = 'bold';
-        titleElement.style.marginBottom = '5px';
       }
       if (urlElement) {
         urlElement.textContent = tabInfo.url || 'URLなし';
-        urlElement.style.wordBreak = 'break-all';
-        urlElement.style.fontSize = '0.9em';
-        urlElement.style.color = '#666';
       }
-      
+
       tabInfoDisplay.classList.add('active');
       tabInfoDisplay.classList.remove(CSS_CLASSES.HIDDEN);
     } else {
@@ -603,20 +611,20 @@ async function displayTabInfo() {
 function setupTabInfoAutoUpdate() {
   chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== 'local') return;
-    
+
     // KINTONE_TAB_IDまたはKINTONE_TAB_INFOが変更された場合
     if (changes[STORAGE_KEYS.KINTONE_TAB_ID] || changes[STORAGE_KEYS.KINTONE_TAB_INFO]) {
       displayTabInfo();
     }
   });
-  
+
   // 削除ボタンのセットアップ
   const clearTabBtn = document.getElementById('clear-tab-btn');
   if (clearTabBtn) {
     clearTabBtn.addEventListener('click', async () => {
       await ConfigManager.clearKintoneTab();
       await displayTabInfo();
-      showSaveMessage(CONFIG_DOM_IDS.TAB_MESSAGE);
+      showToast('タブの記憶を削除しました', { type: 'info' });
     });
   }
 }
