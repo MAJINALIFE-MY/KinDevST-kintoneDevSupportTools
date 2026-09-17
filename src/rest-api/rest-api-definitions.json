@@ -833,6 +833,20 @@
     ]
   },
   {
+    "category": "検索",
+    "apis": [
+      {
+        "name": "POST /k/v1/search.json",
+        "displayName": "【APIラボ】kintone全体を検索する",
+        "method": "POST",
+        "endpoint": "/k/v1/search.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/search/search-data/",
+        "bodyPlaceholder": "{\"query\":[{\"operator\":\"AND\",\"keywords\":[\"abc\",\"def\"]}]}",
+        "args": []
+      }
+    ]
+  },
+  {
     "category": "API情報",
     "apis": [
       {
