@@ -103,19 +103,31 @@ export class ApiSelector {
             displayName = api.name;
           }
 
+          // 未提供APIは将来の枠として表示するが、現在は選択・実行できないようにする
+          const isUnavailable = api.available === false;
+          const availabilityMessage = api.availabilityMessage || '';
+          const displayText = availabilityMessage
+            ? `${displayName}（${availabilityMessage}）`
+            : displayName;
+
           // 表示名用のオプション
           const optionDisplay = document.createElement('option');
           optionDisplay.value = api.name;
-          optionDisplay.textContent = displayName;
+          optionDisplay.textContent = displayText;
+          optionDisplay.disabled = isUnavailable;
           groupDisplay.appendChild(optionDisplay);
 
           // API名用のオプション
           const optionName = document.createElement('option');
           optionName.value = api.name;
           // 重複の場合は【重複】を付与（showDuplicateFlagがtrueの場合のみ）
-          optionName.textContent = (this.showDuplicateFlag && isDuplicate)
+          const apiNameText = (this.showDuplicateFlag && isDuplicate)
             ? `【重複】${api.name}`
             : api.name;
+          optionName.textContent = availabilityMessage
+            ? `${apiNameText}（${availabilityMessage}）`
+            : apiNameText;
+          optionName.disabled = isUnavailable;
           groupName.appendChild(optionName);
         });
       }

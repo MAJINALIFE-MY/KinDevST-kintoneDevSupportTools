@@ -3175,5 +3175,74 @@
         ]
       }
     ]
+  },
+  {
+    "category": "2026年10月アップデート予定",
+    "apis": [
+      {
+        "name": "kintone.app.record.showAddTableRowButtons()",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.mobile.app.record.showAddTableRowButtons()",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.app.record.showDeleteTableRowButtons()",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.mobile.app.record.showDeleteTableRowButtons()",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.app.record.getAddTableRowButtonsDisplayState()",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.mobile.app.record.getAddTableRowButtonsDisplayState()",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.app.record.getDeleteTableRowButtonsDisplayState()",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      },
+      {
+        "name": "kintone.mobile.app.record.getDeleteTableRowButtonsDisplayState()",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
+        "args": [],
+        "available": false,
+        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+      }
+    ]
   }
 ]
