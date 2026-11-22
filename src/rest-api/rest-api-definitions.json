@@ -474,6 +474,24 @@
         "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/apps/settings/update-customization/",
         "bodyPlaceholder": "{\"app\": 21, \"scope\": \"ALL\", \"desktop\": {\"js\": [{\"type\": \"URL\", \"url\": \"https://www.example.com/example.js\"}], \"css\": []}, \"mobile\": {\"js\": [], \"css\": []}}",
         "args": []
+      },
+      {
+        "name": "GET /k/v1/app/plugin/config.json",
+        "displayName": "【APIラボ】アプリに追加されているプラグインの設定情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/plugin/config.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/apps/get-app-plugin-config/",
+        "bodyPlaceholder": "{\"app\": 1, \"id\": \"djmhffjhfgmebgnmcggopedaofckljlj\"}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/plugin/config.json",
+        "displayName": "【APIラボ】アプリに追加されているプラグインの設定情報を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/plugin/config.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/apps/update-app-plugin-config/",
+        "bodyPlaceholder": "{\"app\": 1, \"id\": \"djmhffjhfgmebgnmcggopedaofckljlj\", \"config\": {\"key1\": \"value1\", \"key2\": \"value2\"}}",
+        "args": []
       }
     ]
   },
@@ -619,6 +637,29 @@
     ]
   },
   {
+    "category": "アプリ - カテゴリー",
+    "apis": [
+      {
+        "name": "GET /k/v1/app/categories.json",
+        "displayName": "【APIラボ】カテゴリーの設定情報を取得する",
+        "method": "GET",
+        "endpoint": "/k/v1/app/categories.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/apps/get-categories/",
+        "bodyPlaceholder": "{\"app\": 1, \"lang\": \"ja\"}",
+        "args": []
+      },
+      {
+        "name": "PUT /k/v1/preview/app/categories.json",
+        "displayName": "【APIラボ】カテゴリーの設定情報を変更する",
+        "method": "PUT",
+        "endpoint": "/k/v1/preview/app/categories.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/apps/update-categories/",
+        "bodyPlaceholder": "{\"app\": 1, \"enabled\": true, \"categories\": {\"カテゴリー1\": {\"name\": \"カテゴリー1\", \"index\": \"0\", \"children\": {}}}, \"revision\": \"2\"}",
+        "args": []
+      }
+    ]
+  },
+  {
     "category": "アプリ - 運用管理",
     "apis": [
       {
@@ -651,6 +692,15 @@
         "endpoint": "/k/v1/space.json",
         "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/spaces/update-space/",
         "bodyPlaceholder": "{\"id\": 1, \"name\": \"スペース名\"}",
+        "args": []
+      },
+      {
+        "name": "POST /k/v1/space.json",
+        "displayName": "【APIラボ】スペースを作成する",
+        "method": "POST",
+        "endpoint": "/k/v1/space.json",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/spaces/add-space-by-name/",
+        "bodyPlaceholder": "{\"name\": \"スペース名\"}",
         "args": []
       },
       {
@@ -837,10 +887,10 @@
     "apis": [
       {
         "name": "POST /k/v1/search.json",
-        "displayName": "【APIラボ】kintone全体を検索する",
+        "displayName": "kintone全体を検索する",
         "method": "POST",
         "endpoint": "/k/v1/search.json",
-        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/rest-api/search/search-data/",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/rest-api/search/search-data/",
         "bodyPlaceholder": "{\"query\":[{\"operator\":\"AND\",\"keywords\":[\"abc\",\"def\"]}]}",
         "args": []
       }

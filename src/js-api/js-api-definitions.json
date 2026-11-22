@@ -1760,6 +1760,182 @@
           "record.detail",
           "record.edit"
         ]
+      },
+      {
+        "name": "kintone.app.record.setTableFieldStyle(fieldCode, config)",
+        "displayName": "【APIラボ】テーブルフィールドにスタイルを設定する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/set-table-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを設定するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "スタイルの設定オブジェクト。header はヘッダー、body は行IDごとのセルに適用する。DEFAULT を指定するとすべてのスタイルの適用が解除される。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。",
+            "placeholder": "{\"header\":[{\"column\":\"数値_0\",\"content\":{\"fontWeight\":\"bold\",\"color\":\"#ff4949\"}}],\"body\":[{\"rowId\":\"1\",\"style\":[{\"column\":\"数値_0\",\"content\":{\"backgroundColor\":\"#95d542\"}}]}]}"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail",
+          "record.print"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.setTableFieldStyle(fieldCode, config)",
+        "displayName": "【APIラボ】テーブルフィールドにスタイルを設定する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/set-table-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを設定するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "スタイルの設定オブジェクト。header はヘッダー、body は行IDごとのセルに適用する。DEFAULT を指定するとすべてのスタイルの適用が解除される。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。",
+            "placeholder": "{\"header\":[{\"column\":\"数値_0\",\"content\":{\"fontWeight\":\"bold\",\"color\":\"#ff4949\"}}],\"body\":[{\"rowId\":\"1\",\"style\":[{\"column\":\"数値_0\",\"content\":{\"backgroundColor\":\"#95d542\"}}]}]}"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail"
+        ]
+      },
+      {
+        "name": "kintone.app.record.getTableFieldStyle(fieldCode)",
+        "displayName": "【APIラボ】テーブルフィールドに設定されているスタイルを取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/get-table-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを取得するテーブルのフィールドコード。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail",
+          "record.print"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.getTableFieldStyle(fieldCode)",
+        "displayName": "【APIラボ】テーブルフィールドに設定されているスタイルを取得する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/get-table-field-style/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "スタイルを取得するテーブルのフィールドコード。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail"
+        ]
+      }
+    ]
+  },
+  {
+    "category": "テーブルフィールドの操作",
+    "apis": [
+      {
+        "name": "kintone.app.record.createCustomTableColumn(fieldCode, config, insertPosition)",
+        "displayName": "【APIラボ】テーブルフィールドにカスタマイズ列を作成する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/create-custom-table-column/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "カスタマイズ列を作成するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "カスタマイズ列の設定。header.label と、行IDごとの body[].contents（type は BUTTON）を指定する。すべてのプロパティを省略する場合は {}。onClick はサイドパネルから渡せない。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。戻り値の update / remove は実行結果のJSONには残らない。",
+            "placeholder": "{\"header\":{\"label\":\"操作\"},\"body\":[{\"rowId\":\"行ID\",\"contents\":[{\"type\":\"BUTTON\",\"text\":\"実行\"}]}]}"
+          },
+          {
+            "name": "insertPosition",
+            "type": "string",
+            "required": false,
+            "description": "挿入位置。#FIRST（先頭）、#LAST（末尾）、テーブル内フィールドコード、またはカスタマイズ列の columnCode。省略時は #LAST。",
+            "placeholder": "#LAST"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail",
+          "record.print"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.createCustomTableColumn(fieldCode, config, insertPosition)",
+        "displayName": "【APIラボ】テーブルフィールドにカスタマイズ列を作成する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/record/create-custom-table-column/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "カスタマイズ列を作成するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "config",
+            "type": "object",
+            "required": true,
+            "description": "カスタマイズ列の設定。header.label と、行IDごとの body[].contents（type は BUTTON）を指定する。すべてのプロパティを省略する場合は {}。onClick はサイドパネルから渡せない。検討中の新機能「JavaScript API：テーブルの行へのID付与、テーブル操作時のイベント発生、およびテーブル操作用APIを追加する機能」を有効にする必要がある。戻り値の update / remove は実行結果のJSONには残らない。",
+            "placeholder": "{\"header\":{\"label\":\"操作\"},\"body\":[{\"rowId\":\"行ID\",\"contents\":[{\"type\":\"BUTTON\",\"text\":\"実行\"}]}]}"
+          },
+          {
+            "name": "insertPosition",
+            "type": "string",
+            "required": false,
+            "description": "挿入位置。#FIRST（先頭）、#LAST（末尾）、テーブル内フィールドコード、またはカスタマイズ列の columnCode。省略時は #LAST。",
+            "placeholder": "#LAST"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit",
+          "record.detail"
+        ]
       }
     ]
   },
@@ -2330,6 +2506,114 @@
         "mobileScreens": [
           "record.index"
         ]
+      },
+      {
+        "name": "kintone.app.record.showAddTableRowButtons(fieldCode, state)",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-add-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "行の追加ボタンの表示／非表示を切り替えるテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.showAddTableRowButtons(fieldCode, state)",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-add-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "行の追加ボタンの表示／非表示を切り替えるテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit"
+        ]
+      },
+      {
+        "name": "kintone.app.record.showDeleteTableRowButtons(fieldCode, state)",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-delete-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "行の削除ボタンの表示／非表示を切り替えるテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.showDeleteTableRowButtons(fieldCode, state)",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/show-or-hide-delete-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "行の削除ボタンの表示／非表示を切り替えるテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": true,
+            "description": "VISIBLE：ボタンを表示する、HIDDEN：ボタンを非表示にする",
+            "placeholder": "HIDDEN"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit"
+        ]
       }
     ]
   },
@@ -2636,6 +2920,86 @@
         "pcScreens": [],
         "mobileScreens": [
           "record.detail"
+        ]
+      },
+      {
+        "name": "kintone.app.record.getAddTableRowButtonsDisplayState(fieldCode)",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-add-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.getAddTableRowButtonsDisplayState(fieldCode)",
+        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-add-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit"
+        ]
+      },
+      {
+        "name": "kintone.app.record.getDeleteTableRowButtonsDisplayState(fieldCode)",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-delete-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.create",
+          "record.edit"
+        ],
+        "mobileScreens": []
+      },
+      {
+        "name": "kintone.mobile.app.record.getDeleteTableRowButtonsDisplayState(fieldCode)",
+        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する（モバイル）",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/js-api/record/get-display-state-delete-table-row-buttons/",
+        "args": [
+          {
+            "name": "fieldCode",
+            "type": "string",
+            "required": true,
+            "description": "表示状態を取得するテーブルのフィールドコード",
+            "placeholder": "テーブル"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [],
+        "mobileScreens": [
+          "record.create",
+          "record.edit"
         ]
       }
     ]
@@ -3177,71 +3541,37 @@
     ]
   },
   {
-    "category": "2026年10月アップデート予定",
+    "category": "生成AI",
     "apis": [
       {
-        "name": "kintone.app.record.showAddTableRowButtons()",
-        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.mobile.app.record.showAddTableRowButtons()",
-        "displayName": "テーブルフィールドの行の追加ボタンの表示／非表示を切り替える（モバイル）",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.app.record.showDeleteTableRowButtons()",
-        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.mobile.app.record.showDeleteTableRowButtons()",
-        "displayName": "テーブルフィールドの行の削除ボタンの表示／非表示を切り替える（モバイル）",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.app.record.getAddTableRowButtonsDisplayState()",
-        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.mobile.app.record.getAddTableRowButtonsDisplayState()",
-        "displayName": "テーブルフィールドの行の追加ボタンの表示状態を取得する（モバイル）",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.app.record.getDeleteTableRowButtonsDisplayState()",
-        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
-      },
-      {
-        "name": "kintone.mobile.app.record.getDeleteTableRowButtonsDisplayState()",
-        "displayName": "テーブルフィールドの行の削除ボタンの表示状態を取得する（モバイル）",
-        "docUrl": "https://cybozu.dev/ja/kintone/news/api-updates/2026-10/",
-        "args": [],
-        "available": false,
-        "availabilityMessage": "2026年10月アップデートにて追加予定（現在は利用できません）"
+        "name": "kintone.ai.generateText(options)",
+        "displayName": "【APIラボ】生成AIを使いテキストを生成する",
+        "docUrl": "https://cybozu.dev/ja/kintone/docs/api-lab/js-api/ai/generate-text/",
+        "args": [
+          {
+            "name": "options",
+            "type": "object",
+            "required": true,
+            "description": "テキスト生成の設定。model と messages は必須。temperature は 0以上1以下、maxTokens は 1以上8192以下。検討中の新機能「kintone AI：生成AIでテキストを生成するJavaScript API」と、kintone AI の同機能を有効にする必要がある。戻り値の textStream / partialOutputStream は実行結果のJSONには残らない。",
+            "placeholder": "{\"model\":\"claude-4-6-sonnet-v1\",\"messages\":[{\"role\":\"user\",\"content\":\"フランスの首都はどこですか？\"}],\"temperature\":0.5,\"maxTokens\":500}"
+          }
+        ],
+        "returnsPromise": true,
+        "pcScreens": [
+          "record.index",
+          "record.create",
+          "record.edit",
+          "record.detail",
+          "record.print",
+          "report"
+        ],
+        "mobileScreens": [
+          "record.index",
+          "record.create",
+          "record.edit",
+          "record.detail",
+          "report"
+        ]
       }
     ]
   }
